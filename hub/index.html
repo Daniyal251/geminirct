@@ -1541,6 +1541,8 @@ tbody tr:last-child td { border-bottom: none; }
 @media (max-width: 1024px) and (min-width: 769px) {
   .sidebar { width: 60px !important; overflow-x: hidden; }
   .main { margin-left: 60px !important; padding: 24px 16px 60px !important; }
+  /* Скрываем collapse-кнопку: sidebar уже в иконном режиме, кнопка торчит за её край */
+  .sidebar-collapse-btn { display: none !important; }
   .sidebar .logo-section { padding: 16px 10px 14px; text-align: center; }
   .sidebar .logo-section span, .sidebar .nav-item .label,
   .sidebar .user-bar .user-name, .sidebar .user-role-text,
@@ -2521,7 +2523,7 @@ tbody tr:last-child td { border-bottom: none; }
               <div><div style="font-size:13px;font-weight:700">Groq</div><div style="font-size:10px;color:var(--accent)">БЕСПЛАТНО · 1000 запр/день</div></div>
               <div id="adm-st-groq" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--text3)"></div>
             </div>
-            <input type="password" id="adm-groq-key" placeholder="gsk_..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:monospace;font-size:11px;box-sizing:border-box;margin-bottom:8px">
+            <input type="password" id="adm-groq-key" placeholder="gsk_..." oninput="debouncedAdmKeySave()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:monospace;font-size:11px;box-sizing:border-box;margin-bottom:8px">
             <div style="display:flex;gap:6px"><button class="btn btn-secondary" onclick="admTestProvider('groq')" style="flex:1;font-size:11px;padding:6px">🧪 Тест</button><a href="https://console.groq.com" target="_blank" class="btn btn-secondary" style="flex:1;font-size:11px;padding:6px;text-align:center;text-decoration:none">🔗 Получить</a></div>
           </div>
 
@@ -2532,7 +2534,7 @@ tbody tr:last-child td { border-bottom: none; }
               <div><div style="font-size:13px;font-weight:700">Gemini</div><div style="font-size:10px;color:var(--accent)">БЕСПЛАТНО · 1500 запр/день</div></div>
               <div id="adm-st-gemini" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--text3)"></div>
             </div>
-            <input type="password" id="adm-gemini-key" placeholder="AIza..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:monospace;font-size:11px;box-sizing:border-box;margin-bottom:8px">
+            <input type="password" id="adm-gemini-key" placeholder="AIza..." oninput="debouncedAdmKeySave()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:monospace;font-size:11px;box-sizing:border-box;margin-bottom:8px">
             <div style="display:flex;gap:6px"><button class="btn btn-secondary" onclick="admTestProvider('gemini')" style="flex:1;font-size:11px;padding:6px">🧪 Тест</button><a href="https://aistudio.google.com/apikey" target="_blank" class="btn btn-secondary" style="flex:1;font-size:11px;padding:6px;text-align:center;text-decoration:none">🔗 Получить</a></div>
           </div>
 
@@ -2543,7 +2545,7 @@ tbody tr:last-child td { border-bottom: none; }
               <div><div style="font-size:13px;font-weight:700">Claude</div><div style="font-size:10px;color:var(--orange)">ПЛАТНО · Лучшее качество</div></div>
               <div id="adm-st-claude" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--text3)"></div>
             </div>
-            <input type="password" id="adm-claude-key" placeholder="sk-ant-api03-..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:monospace;font-size:11px;box-sizing:border-box;margin-bottom:8px">
+            <input type="password" id="adm-claude-key" placeholder="sk-ant-api03-..." oninput="debouncedAdmKeySave()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:monospace;font-size:11px;box-sizing:border-box;margin-bottom:8px">
             <div style="display:flex;gap:6px"><button class="btn btn-secondary" onclick="admTestProvider('claude')" style="flex:1;font-size:11px;padding:6px">🧪 Тест</button><a href="https://console.anthropic.com/settings/keys" target="_blank" class="btn btn-secondary" style="flex:1;font-size:11px;padding:6px;text-align:center;text-decoration:none">🔗 Получить</a></div>
           </div>
 
@@ -2554,7 +2556,7 @@ tbody tr:last-child td { border-bottom: none; }
               <div><div style="font-size:13px;font-weight:700">DeepSeek</div><div style="font-size:10px;color:var(--accent)">ДЁШЕВО · Отлично на русском</div></div>
               <div id="adm-st-deepseek" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--text3)"></div>
             </div>
-            <input type="password" id="adm-deepseek-key" placeholder="sk-..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:monospace;font-size:11px;box-sizing:border-box;margin-bottom:8px">
+            <input type="password" id="adm-deepseek-key" placeholder="sk-..." oninput="debouncedAdmKeySave()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:monospace;font-size:11px;box-sizing:border-box;margin-bottom:8px">
             <div style="display:flex;gap:6px"><button class="btn btn-secondary" onclick="admTestProvider('deepseek')" style="flex:1;font-size:11px;padding:6px">🧪 Тест</button><a href="https://platform.deepseek.com" target="_blank" class="btn btn-secondary" style="flex:1;font-size:11px;padding:6px;text-align:center;text-decoration:none">🔗 Получить</a></div>
           </div>
         </div>
@@ -14429,10 +14431,46 @@ function admRenderCascade(cascadeJson) {
   const el = document.getElementById('adm-cascade');
   if (!el) return;
   el.innerHTML = order.map((p, i) => {
-    return '<div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border);cursor:move" draggable="true" data-provider="'+p+'">' +
+    return '<div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border);cursor:move;transition:opacity .15s" draggable="true" data-provider="'+p+'">' +
       '<span style="font-size:14px;font-weight:700;color:'+colors[p]+'">'+(i+1)+'</span>' +
       '<span style="font-size:13px">'+names[p]+'</span></div>';
   }).join('');
+  // Drag-and-drop handlers
+  let dragSrc = null;
+  el.querySelectorAll('[data-provider]').forEach(function(item) {
+    item.addEventListener('dragstart', function(e) {
+      dragSrc = this;
+      e.dataTransfer.effectAllowed = 'move';
+      this.style.opacity = '0.4';
+    });
+    item.addEventListener('dragend', function() {
+      this.style.opacity = '';
+      el.querySelectorAll('[data-provider]').forEach(function(i) { i.style.border = '1px solid var(--border)'; });
+    });
+    item.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      this.style.border = '1px solid var(--accent)';
+    });
+    item.addEventListener('dragleave', function() {
+      this.style.border = '1px solid var(--border)';
+    });
+    item.addEventListener('drop', function(e) {
+      e.preventDefault();
+      this.style.border = '1px solid var(--border)';
+      if (dragSrc && dragSrc !== this) {
+        const items = Array.from(el.querySelectorAll('[data-provider]'));
+        const srcIdx = items.indexOf(dragSrc);
+        const tgtIdx = items.indexOf(this);
+        if (srcIdx < tgtIdx) el.insertBefore(dragSrc, this.nextSibling);
+        else el.insertBefore(dragSrc, this);
+        // Перенумеровать
+        el.querySelectorAll('[data-provider]').forEach(function(d, i) {
+          d.querySelector('span:first-child').textContent = i + 1;
+        });
+      }
+    });
+  });
 }
 
 async function adminSaveSettings() {
@@ -14457,6 +14495,17 @@ async function adminSaveSettings() {
   setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
   adminLoadSettings(); // Refresh dots
 }
+
+// Автосохранение API-ключей с задержкой 1 сек после последнего ввода
+const debouncedAdmKeySave = debounce(async function() {
+  for (const [elId, dbKey] of Object.entries(ADM_SETTINGS_MAP)) {
+    const el = document.getElementById(elId);
+    if (!el || !el.value.trim()) continue;
+    try { await SB.from('settings').upsert({ key: dbKey, value: el.value, updated_at: new Date().toISOString() }, { onConflict: 'key' }); } catch(e) {}
+  }
+  const s = document.getElementById('adm-save-status');
+  if (s) { s.innerHTML = '<span style="color:var(--accent)">✅ Автосохранено</span>'; setTimeout(() => { s.innerHTML = ''; }, 2000); }
+}, 1000);
 
 async function admTestProvider(provider) {
   const p = ADM_PROVIDERS.find(x => x.id === provider);
