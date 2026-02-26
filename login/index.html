@@ -1,0 +1,522 @@
+<!DOCTYPE html><html lang="ru"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0">
+<title>Вход — RCT</title><meta name="description" content="Вход в систему управления RKT HUB">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#060a14;--bg2:#0c1220;--bg3:#121a2c;--bg4:#1a2540;
+--accent:#00e5a0;--accent2:#00c48c;--accent-d:rgba(0,229,160,.06);
+--blue:#3b82f6;--blue-d:rgba(59,130,246,.06);
+--purple:#8b5cf6;--purple-d:rgba(139,92,246,.06);
+--orange:#f59e0b;--red:#ef4444;--pink:#ec4899;--cyan:#06b6d4;
+--text:#edf2f7;--text2:#94a3b8;--text3:#64748b;--text4:#475569;
+--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);
+--font-d:'Unbounded',sans-serif;--font-b:'Manrope',sans-serif;
+--max:1240px}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.6}
+::selection{background:var(--accent);color:var(--bg)}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.rv{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}.rv.v{opacity:1;transform:none}
+.rv-d1{transition-delay:.1s}.rv-d2{transition-delay:.2s}.rv-d3{transition-delay:.3s}.rv-d4{transition-delay:.4s}.rv-d5{transition-delay:.5s}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:10px 0;transition:all .35s}
+.nav.sc{background:rgba(6,10,20,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:6px 0}
+.nav-w{max-width:var(--max);margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:8px}
+.nav-logo{font-family:var(--font-d);font-weight:800;font-size:18px;display:flex;align-items:center;gap:7px;margin-right:auto;white-space:nowrap}
+.nav-logo em{font-style:normal;font-size:10px;color:var(--text3);font-weight:500;margin-left:2px}
+.nav-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;flex-shrink:0}
+.nav-links{display:flex;gap:4px;align-items:center}
+.nl{font-size:12.5px;font-weight:600;color:var(--text3);padding:6px 12px;border-radius:6px;transition:all .25s;white-space:nowrap}
+.nl:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nl.ac{color:var(--text);background:rgba(255,255,255,.06)}
+.nav-r{display:flex;gap:6px;margin-left:auto;flex-shrink:0;align-items:center}
+.nav-login{padding:7px 14px;border:1px solid var(--border2);border-radius:7px;font-size:11.5px;font-weight:600;color:var(--text2);transition:all .25s}
+.nav-login:hover{border-color:var(--accent);color:var(--accent)}
+.nav-cta{padding:7px 16px;background:var(--accent);color:var(--bg);font-weight:700;font-size:11px;border-radius:7px;letter-spacing:.4px;text-transform:uppercase;transition:all .25s}
+.nav-cta:hover{background:#fff;box-shadow:0 4px 12px rgba(0,229,160,.2)}
+.burger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:8px;margin-left:8px}
+.burger span{width:20px;height:2px;background:var(--text);border-radius:2px;transition:.3s}
+.mob{display:none;position:fixed;inset:0;background:rgba(6,10,20,.97);backdrop-filter:blur(20px);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.mob.open{display:flex}
+.mob a{font-size:16px;font-weight:600;color:var(--text2);padding:10px 20px;transition:.25s}
+.mob a:hover,.mob a.ac{color:var(--accent)}
+.mob-x{position:absolute;top:16px;right:20px;font-size:24px;color:var(--text);background:none;border:none;cursor:pointer}
+
+/* ── COMMON ── */
+.w{max-width:var(--max);margin:0 auto;padding:0 20px}
+section{padding:64px 0}
+.sh{text-align:center;margin-bottom:40px}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:var(--accent-d);border:1px solid rgba(0,229,160,.1);border-radius:100px;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px}
+.tag-b{background:var(--blue-d);border-color:rgba(59,130,246,.1);color:var(--blue)}
+.tag-p{background:var(--purple-d);border-color:rgba(139,92,246,.1);color:var(--purple)}
+.tag-o{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.1);color:var(--orange)}
+.sh h2{font-family:var(--font-d);font-size:clamp(22px,3.2vw,36px);font-weight:800;line-height:1.15;margin-bottom:10px}
+.sh p{font-size:14px;color:var(--text2);max-width:500px;margin:0 auto;line-height:1.65}
+.btn{padding:10px 22px;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:7px;border:none;font-family:var(--font-b)}
+.btn-a{background:var(--accent);color:var(--bg)}.btn-a:hover{background:#fff;transform:translateY(-2px)}
+.btn-g{background:none;color:var(--text);border:1px solid var(--border2)}.btn-g:hover{border-color:var(--accent);color:var(--accent)}
+.btn-b{background:var(--blue);color:#fff}.btn-b:hover{background:#2563eb}
+.btn-p{background:var(--purple);color:#fff}.btn-p:hover{background:#7c3aed}
+.btn-o{background:var(--orange);color:#000}.btn-o:hover{background:#eab308}
+.gr{background:linear-gradient(135deg,var(--accent),var(--blue));background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s ease infinite}
+.cta-box{background:linear-gradient(135deg,rgba(0,229,160,.03),rgba(59,130,246,.03));border:1px solid var(--border);border-radius:20px;padding:40px 28px;text-align:center}
+.cta-box h2{font-family:var(--font-d);font-size:clamp(18px,2.5vw,28px);font-weight:800;margin-bottom:10px}
+.cta-box>p{font-size:13.5px;color:var(--text2);max-width:420px;margin:0 auto 20px;line-height:1.6}
+.cta-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.cta-info{display:flex;gap:20px;justify-content:center;margin-top:20px;flex-wrap:wrap;font-size:12.5px;color:var(--text3)}
+.cta-info span{margin-right:4px}
+
+/* ── FOOTER ── */
+.ft{background:var(--bg2);border-top:1px solid var(--border);padding:24px 0 14px}
+.ft-w{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.ft-logo{font-family:var(--font-d);font-weight:800;font-size:15px;display:flex;align-items:center;gap:6px}
+.ft-links{display:flex;gap:14px;flex-wrap:wrap}
+.ft-link{font-size:11.5px;color:var(--text3);transition:.25s}.ft-link:hover{color:var(--accent)}
+.ft-copy{width:100%;text-align:center;padding-top:12px;margin-top:12px;border-top:1px solid var(--border);font-size:10.5px;color:var(--text4)}
+
+/* ── PAGE HERO ── */
+.ph{padding:72px 0 32px;text-align:center}
+.ph h1{font-family:var(--font-d);font-size:clamp(24px,4vw,44px);font-weight:900;margin-bottom:10px;line-height:1.12}
+.ph>p{font-size:14.5px;color:var(--text2);max-width:520px;margin:0 auto;line-height:1.65}
+
+@media(max-width:900px){.nav-links{display:none}.burger{display:flex}}
+@media(max-width:768px){section{padding:44px 0}.ft-w{flex-direction:column;text-align:center}.cta-info{flex-direction:column;align-items:center;gap:8px}}
+@media(max-width:480px){.w{padding:0 14px}}
+
+
+.login-w{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:60px 16px 32px}
+.login-g{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:620px;width:100%}
+.lc{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:36px 24px;text-align:center;transition:.35s;color:var(--text)}
+.lc:hover{transform:translateY(-5px)}
+.lc--s:hover{border-color:rgba(0,229,160,.2);box-shadow:0 12px 40px rgba(0,229,160,.05)}
+.lc--c:hover{border-color:rgba(59,130,246,.2);box-shadow:0 12px 40px rgba(59,130,246,.05)}
+.lc-i{font-size:44px;margin-bottom:14px;display:block}
+.lc-n{font-family:var(--font-d);font-size:16px;font-weight:700;margin-bottom:5px}
+.lc-d{font-size:12.5px;color:var(--text2);line-height:1.5;margin-bottom:16px}
+.lc-btn{display:inline-flex;padding:9px 20px;border-radius:8px;font-weight:700;font-size:12px;transition:.25s}
+.lc--s .lc-btn{background:var(--accent-d);color:var(--accent);border:1px solid rgba(0,229,160,.12)}
+.lc--c .lc-btn{background:var(--blue-d);color:var(--blue);border:1px solid rgba(59,130,246,.12)}
+@media(max-width:520px){.login-g{grid-template-columns:1fr;max-width:320px}}
+/* ── AI CHAT v10 ── */
+.ai-fab{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent,#00e5a0),#00b894);border:none;cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 20px rgba(0,229,160,.4);transition:all .3s}
+.ai-fab:hover{transform:scale(1.1)}.ai-fab.open{transform:rotate(90deg) scale(1.1)}
+.ai-panel{position:fixed;bottom:96px;right:24px;width:380px;max-width:calc(100vw - 32px);height:520px;max-height:calc(100vh - 140px);background:var(--bg2,#0c1220);border:1px solid var(--border2,rgba(255,255,255,.1));border-radius:20px;z-index:10001;display:none;flex-direction:column;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,.5);animation:chatUp .3s}
+.ai-panel.show{display:flex}
+@keyframes chatUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ai-head{padding:16px 20px;background:linear-gradient(135deg,rgba(0,229,160,.1),rgba(0,184,148,.05));border-bottom:1px solid var(--border,rgba(255,255,255,.06));display:flex;align-items:center;gap:12px}
+.ai-head-info{flex:1}.ai-head-title{font-size:15px;font-weight:700;color:var(--text,#edf2f7)}.ai-head-sub{font-size:12px;color:var(--text2,#94a3b8);margin-top:2px}
+.ai-head-dot{width:8px;height:8px;border-radius:50%;background:#00e5a0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.ai-close{background:none;border:none;color:var(--text3,#64748b);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:8px}.ai-close:hover{background:rgba(255,255,255,.05)}
+.ai-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.ai-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.55;word-wrap:break-word;white-space:pre-wrap}
+.ai-msg.bot{align-self:flex-start;background:var(--bg3,#121a2c);color:var(--text,#edf2f7);border-bottom-left-radius:4px}
+.ai-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent,#00e5a0),#00b894);color:var(--bg,#060a14);font-weight:500;border-bottom-right-radius:4px}
+.ai-msg .ai-model{display:block;font-size:10px;color:var(--text3,#64748b);margin-top:6px;font-style:italic}
+.ai-typing{align-self:flex-start;padding:12px 16px;background:var(--bg3,#121a2c);border-radius:14px;border-bottom-left-radius:4px;display:none;gap:4px}
+.ai-typing.show{display:flex}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--text3,#64748b);animation:dotB 1.4s infinite}.ai-typing span:nth-child(2){animation-delay:.2s}.ai-typing span:nth-child(3){animation-delay:.4s}
+@keyframes dotB{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.ai-quick{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
+.ai-quick-btn{background:var(--bg3,#121a2c);border:1px solid var(--border2,rgba(255,255,255,.1));color:var(--text,#edf2f7);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}.ai-quick-btn:hover{background:var(--accent,#00e5a0);color:var(--bg,#060a14);border-color:var(--accent,#00e5a0)}
+.ai-foot{padding:12px 16px;border-top:1px solid var(--border,rgba(255,255,255,.06));display:flex;gap:8px;align-items:center}
+.ai-foot input{flex:1;background:var(--bg3,#121a2c);border:1px solid var(--border2,rgba(255,255,255,.1));color:var(--text,#edf2f7);padding:10px 14px;border-radius:12px;font-size:13.5px;outline:none;font-family:inherit}.ai-foot input::placeholder{color:var(--text3,#64748b)}.ai-foot input:focus{border-color:var(--accent,#00e5a0)}
+.ai-foot button{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent,#00e5a0),#00b894);border:none;color:var(--bg,#060a14);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}.ai-foot button:hover{transform:scale(1.05)}.ai-foot button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+@media(max-width:480px){.ai-panel{bottom:0;right:0;width:100%;height:100vh;max-height:100vh;border-radius:0}.ai-fab{bottom:16px;right:16px;width:52px;height:52px;font-size:24px}}
+
+</style></head><body>
+<nav class="nav" id="N"><div class="nav-w">
+<a href="/" class="nav-logo"><span class="nav-dot"></span>RCT<em>группа компаний</em></a>
+<div class="nav-links"><a href="/" class="nl">Главная</a><a href="/med/" class="nl">Медоборудование</a><a href="/sites/" class="nl">Сайты</a><a href="/content/" class="nl">AI-контент</a><a href="/ai/" class="nl">ИИ-агенты</a><a href="/about/" class="nl">О компании</a></div>
+<div class="nav-r"><a href="/login/" class="nav-login">Войти</a><a href="/order/" class="nav-cta">Заказать</a></div>
+<div class="burger" onclick="document.getElementById('M').classList.add('open')"><span></span><span></span><span></span></div>
+</div></nav>
+<div class="mob" id="M"><button class="mob-x" onclick="this.parentElement.classList.remove('open')">✕</button>
+<a href="/" class="">Главная</a><a href="/med/" class="">Медоборудование</a><a href="/sites/" class="">Сайты</a><a href="/content/" class="">AI-контент</a><a href="/ai/" class="">ИИ-агенты</a><a href="/about/" class="">О компании</a><a href="/login/">Войти</a><a href="/order/" class="btn btn-a" style="margin-top:8px">Заказать</a></div>
+<main style="padding-top:56px">
+
+<div class="login-w"><div>
+<div style="text-align:center;margin-bottom:28px"><h2 style="font-family:var(--font-d);font-size:22px;font-weight:800;margin-bottom:6px">Вход в систему</h2><p style="color:var(--text2);font-size:13px">Выберите портал</p></div>
+<div class="login-g">
+<a href="/hub/" class="lc lc--s"><span class="lc-i">👨‍💼</span><div class="lc-n">Сотрудникам</div><div class="lc-d">Задачи, проекты, CRM-воронка, аналитика, коммуникации</div><span class="lc-btn">Войти в панель →</span></a>
+<a href="/client/" class="lc lc--c"><span class="lc-i">🏢</span><div class="lc-n">Клиентам</div><div class="lc-d">Мои проекты, заявки на правки, статусы, ИИ-помощник</div><span class="lc-btn">Личный кабинет →</span></a>
+</div>
+</div></div>
+
+</main>
+<footer class="ft"><div class="w"><div class="ft-w">
+<a href="/" class="ft-logo"><span class="nav-dot"></span>RCT</a>
+<div class="ft-links">
+<a href="/" class="ft-link">Главная</a><a href="/med/" class="ft-link">Медоборудование</a>
+<a href="/sites/" class="ft-link">Сайты</a><a href="/content/" class="ft-link">AI-контент</a>
+<a href="/ai/" class="ft-link">ИИ-агенты</a><a href="/about/" class="ft-link">О компании</a>
+<a href="https://t.me/AIhroject_bot" class="ft-link" target="_blank">Telegram</a>
+</div>
+<div class="ft-copy">© 2025–2026 RCT — Российские Компьютерные Технологии · Казань · ОЭЗ «Иннополис» · <a href="mailto:info@rct-hub.ru" style="color:var(--accent)">info@rct-hub.ru</a></div>
+</div></div></footer>
+<script>
+window.addEventListener('scroll',()=>document.getElementById('N').classList.toggle('sc',scrollY>40));
+const ro=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v')}),{threshold:.06,rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+</script>
+
+<!-- AI CHAT v10 Multi-LLM -->
+<button class="ai-fab" id="aiFab" onclick="aiToggle()" aria-label="ИИ-ассистент">🤖</button>
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-head"><div class="ai-head-dot"></div><div class="ai-head-info"><div class="ai-head-title">🤖 ИИ-ассистент RCT</div><div class="ai-head-sub">Multi-AI · Groq + Gemini + Claude + DeepSeek</div></div><button class="ai-close" onclick="aiToggle()">✕</button></div>
+  <div class="ai-body" id="aiBody"><div class="ai-msg bot">Здравствуйте! 👋 Я ИИ-ассистент RCT.<br><br>Расскажу об услугах, ценах, сроках — спрашивайте!</div></div>
+  <div class="ai-quick" id="aiQuick">
+    <button class="ai-quick-btn" onclick="aiSendQuick('Сколько стоит сайт?')">💰 Цены</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Расскажите о медоборудовании')">🏥 Мед</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Что такое AI-контент?')">🎬 Контент</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Хочу заказать')">📝 Заказать</button>
+  </div>
+  <div class="ai-typing" id="aiTyping"><span></span><span></span><span></span></div>
+  <div class="ai-foot"><input id="aiInput" placeholder="Задайте вопрос..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"><button id="aiSendBtn" onclick="aiSend()">➤</button></div>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// RCT AI CHAT v10 — Multi-LLM Cascade: Groq → Gemini → Claude → DeepSeek
+// Все ключи и промпт из Supabase. Единая база знаний.
+// ═══════════════════════════════════════════════════════════════
+const AI_SB = {
+  url: 'https://prparzgqevfelwsndmkc.supabase.co',
+  key: 'sb_publishable_gFeXATQGYxKx08BpeOedZg_7buTwVJq'
+};
+
+let aiCfg = {};
+let aiOpen = false;
+let aiMessages = [];
+let aiSession = 'web_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+let aiLeadSaved = false;
+let aiReady = false;
+
+const DIR_MAP = {'Сайты':'Сайты','AI-контент':'AI-контент','ИИ-агенты':'ИИ-агенты','Медоборудование':'РКТ'};
+
+// ═══ ЗАГРУЗКА КОНФИГА ═══
+async function aiLoadConfig() {
+  try {
+    var res = await fetch(AI_SB.url + '/rest/v1/settings?select=key,value', {
+      headers: { 'apikey': AI_SB.key, 'Authorization': 'Bearer ' + AI_SB.key }
+    });
+    var rows = await res.json();
+    if (!Array.isArray(rows)) return;
+    rows.forEach(function(r) { aiCfg[r.key] = r.value || ''; });
+    
+    // Проверяем есть ли хотя бы один ключ
+    var cascade = aiGetCascade();
+    aiReady = cascade.length > 0;
+
+    if (aiCfg.ai_chat_greeting) {
+      var first = document.querySelector('#aiBody .ai-msg.bot');
+      if (first) first.innerHTML = aiCfg.ai_chat_greeting.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+    }
+  } catch(e) { aiReady = false; }
+}
+
+function aiGetCascade() {
+  var order;
+  try { order = JSON.parse(aiCfg.ai_cascade || '["groq","gemini","claude","deepseek"]'); } catch(e) { order = ['groq','gemini','claude','deepseek']; }
+  // Фильтруем — только те, у кого есть ключ
+  return order.filter(function(p) {
+    if (p === 'groq') return !!aiCfg.groq_api_key;
+    if (p === 'gemini') return !!aiCfg.gemini_api_key;
+    if (p === 'claude') return !!aiCfg.claude_api_key;
+    if (p === 'deepseek') return !!aiCfg.deepseek_api_key;
+    return false;
+  });
+}
+
+aiLoadConfig();
+
+// ═══ UI FUNCTIONS ═══
+function aiToggle() {
+  aiOpen = !aiOpen;
+  document.getElementById('aiPanel').classList.toggle('show', aiOpen);
+  document.getElementById('aiFab').classList.toggle('open', aiOpen);
+  if (aiOpen) document.getElementById('aiInput').focus();
+}
+
+function aiAddMsg(text, who, badge) {
+  var body = document.getElementById('aiBody');
+  var div = document.createElement('div');
+  div.className = 'ai-msg ' + who;
+  if (who === 'bot') {
+    div.innerHTML = text.replace(/\n/g, '<br>');
+    if (badge) div.innerHTML += '<span class="ai-model">' + badge + '</span>';
+  } else { div.textContent = text; }
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function aiShowTyping(on) {
+  var t = document.getElementById('aiTyping');
+  if (t) t.classList.toggle('show', on);
+  document.getElementById('aiBody').scrollTop = document.getElementById('aiBody').scrollHeight;
+}
+
+function aiSetInput(off) {
+  document.getElementById('aiSendBtn').disabled = off;
+  document.getElementById('aiInput').disabled = off;
+}
+
+function aiSendQuick(text) {
+  document.getElementById('aiQuick').style.display = 'none';
+  aiAddMsg(text, 'user');
+  aiCallCascade(text);
+}
+
+function aiSend() {
+  var inp = document.getElementById('aiInput');
+  var text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  document.getElementById('aiQuick').style.display = 'none';
+  aiAddMsg(text, 'user');
+  aiCallCascade(text);
+}
+
+// ═══ КАСКАД: пробуем модели по очереди ═══
+async function aiCallCascade(text) {
+  if (!aiReady) {
+    await aiLoadConfig();
+    if (!aiReady) {
+      aiAddMsg('⚠️ Ни один API ключ не настроен.\nАдминистратор: HUB → Админ-панель → добавьте ключ.\n\nНапишите нам: @AIhroject_bot', 'bot');
+      return;
+    }
+  }
+
+  aiSetInput(true);
+  aiShowTyping(true);
+  aiMessages.push({ role: 'user', content: text });
+  if (aiMessages.length > 20) aiMessages = aiMessages.slice(-20);
+
+  var cascade = aiGetCascade();
+  var timeout = parseInt(aiCfg.ai_timeout_ms || '15000');
+  var systemPrompt = aiCfg.ai_knowledge_base || 'Ты ИИ-ассистент RCT. Отвечай на русском.';
+  var lastError = '';
+
+  for (var i = 0; i < cascade.length; i++) {
+    var provider = cascade[i];
+    var t0 = Date.now();
+    try {
+      var result = await aiCallProvider(provider, text, systemPrompt, timeout);
+      var duration = Date.now() - t0;
+
+      // Парсим [LEAD]
+      var reply = result.text;
+      var leadMatch = reply.match(/\[LEAD\](.*?)\[\/LEAD\]/s);
+      if (leadMatch && !aiLeadSaved) {
+        try {
+          var lead = JSON.parse(leadMatch[1]);
+          if (lead.name && lead.phone) { saveLead(lead); aiLeadSaved = true; }
+        } catch(e) {}
+        reply = reply.replace(/\[LEAD\].*?\[\/LEAD\]/s, '').trim();
+      }
+
+      aiShowTyping(false);
+      var badge = result.badge + ' · ' + (duration/1000).toFixed(1) + 'с';
+      aiAddMsg(reply, 'bot', badge);
+      aiMessages.push({ role: 'assistant', content: reply });
+
+      // Логируем успех
+      aiLog('chat', text, reply.substring(0, 500), result.model, provider, duration, '', '', result.tokIn, result.tokOut);
+      aiSetInput(false);
+      document.getElementById('aiInput').focus();
+      return; // Успех — выходим
+
+    } catch(e) {
+      var duration = Date.now() - t0;
+      lastError = provider + ': ' + e.message;
+      aiLog('error', text, '', provider, provider, duration, e.code || 'ERR', e.message);
+      // Пробуем следующую модель
+      continue;
+    }
+  }
+
+  // Все модели упали
+  aiShowTyping(false);
+  aiAddMsg('⚠️ Все ИИ-модели недоступны.\n\nНапишите нам напрямую:\n🤖 @AIhroject_bot\n📧 info@rct-hub.ru\n📱 +7 987 225-52-25', 'bot');
+  aiSetInput(false);
+}
+
+// ═══ ПРОВАЙДЕРЫ ═══
+async function aiCallProvider(provider, text, systemPrompt, timeout) {
+  var msgs = aiMessages.slice(-10);
+
+  if (provider === 'groq') return await aiCallGroq(text, systemPrompt, msgs, timeout);
+  if (provider === 'gemini') return await aiCallGemini(text, systemPrompt, msgs, timeout);
+  if (provider === 'claude') return await aiCallClaude(text, systemPrompt, msgs, timeout);
+  if (provider === 'deepseek') return await aiCallDeepSeek(text, systemPrompt, msgs, timeout);
+  throw { message: 'Unknown provider', code: 'UNKNOWN' };
+}
+
+// ─── GROQ (OpenAI-compatible) ───
+async function aiCallGroq(text, system, msgs, timeout) {
+  var ctrl = new AbortController();
+  var tm = setTimeout(function(){ ctrl.abort(); }, timeout);
+  var model = aiCfg.groq_model || 'llama-3.3-70b-versatile';
+  
+  var apiMsgs = [{ role: 'system', content: system }];
+  msgs.forEach(function(m) { apiMsgs.push({ role: m.role, content: m.content }); });
+
+  var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + aiCfg.groq_api_key },
+    body: JSON.stringify({ model: model, messages: apiMsgs, max_tokens: 1500, temperature: 0.7 }),
+    signal: ctrl.signal
+  });
+  clearTimeout(tm);
+
+  if (!res.ok) { var e = await res.text(); throw { message: e.substring(0, 200), code: String(res.status) }; }
+  var data = await res.json();
+  return {
+    text: data.choices[0].message.content,
+    model: model,
+    badge: '⚡ Groq',
+    tokIn: data.usage?.prompt_tokens || 0,
+    tokOut: data.usage?.completion_tokens || 0
+  };
+}
+
+// ─── GEMINI ───
+async function aiCallGemini(text, system, msgs, timeout) {
+  var ctrl = new AbortController();
+  var tm = setTimeout(function(){ ctrl.abort(); }, timeout);
+  var model = aiCfg.gemini_model || 'gemini-2.0-flash';
+
+  var contents = [];
+  msgs.forEach(function(m) {
+    contents.push({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] });
+  });
+
+  var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + aiCfg.gemini_api_key, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: system }] },
+      contents: contents,
+      generationConfig: { maxOutputTokens: 1500, temperature: 0.7 }
+    }),
+    signal: ctrl.signal
+  });
+  clearTimeout(tm);
+
+  if (!res.ok) { var e = await res.text(); throw { message: e.substring(0, 200), code: String(res.status) }; }
+  var data = await res.json();
+  var reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  if (!reply) throw { message: 'Empty response', code: 'EMPTY' };
+  return {
+    text: reply,
+    model: model,
+    badge: '✨ Gemini',
+    tokIn: data.usageMetadata?.promptTokenCount || 0,
+    tokOut: data.usageMetadata?.candidatesTokenCount || 0
+  };
+}
+
+// ─── CLAUDE ───
+async function aiCallClaude(text, system, msgs, timeout) {
+  var ctrl = new AbortController();
+  var tm = setTimeout(function(){ ctrl.abort(); }, timeout);
+  var isComplex = text.length > 300 || /HTML|код|script|python|программ|подробн|анализ/i.test(text);
+  var model = isComplex ? (aiCfg.claude_model_smart || 'claude-sonnet-4-5-20250929') : (aiCfg.claude_model_fast || 'claude-haiku-4-5-20251001');
+
+  var res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': aiCfg.claude_api_key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model: model, max_tokens: isComplex ? 4000 : 1500, system: system, messages: msgs }),
+    signal: ctrl.signal
+  });
+  clearTimeout(tm);
+
+  if (!res.ok) { var e = await res.text(); throw { message: e.substring(0, 200), code: String(res.status) }; }
+  var data = await res.json();
+  var reply = data.content.map(function(c) { return c.text || ''; }).join('');
+  var modelName = model.includes('haiku') ? 'Haiku' : 'Sonnet';
+  return {
+    text: reply,
+    model: model,
+    badge: '🧠 Claude ' + modelName,
+    tokIn: data.usage?.input_tokens || 0,
+    tokOut: data.usage?.output_tokens || 0
+  };
+}
+
+// ─── DEEPSEEK (OpenAI-compatible) ───
+async function aiCallDeepSeek(text, system, msgs, timeout) {
+  var ctrl = new AbortController();
+  var tm = setTimeout(function(){ ctrl.abort(); }, timeout);
+  var model = aiCfg.deepseek_model || 'deepseek-chat';
+
+  var apiMsgs = [{ role: 'system', content: system }];
+  msgs.forEach(function(m) { apiMsgs.push({ role: m.role, content: m.content }); });
+
+  var res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + aiCfg.deepseek_api_key },
+    body: JSON.stringify({ model: model, messages: apiMsgs, max_tokens: 1500, temperature: 0.7 }),
+    signal: ctrl.signal
+  });
+  clearTimeout(tm);
+
+  if (!res.ok) { var e = await res.text(); throw { message: e.substring(0, 200), code: String(res.status) }; }
+  var data = await res.json();
+  return {
+    text: data.choices[0].message.content,
+    model: model,
+    badge: '🐋 DeepSeek',
+    tokIn: data.usage?.prompt_tokens || 0,
+    tokOut: data.usage?.completion_tokens || 0
+  };
+}
+
+// ═══ ЛОГИРОВАНИЕ ═══
+function aiLog(type, userMsg, botReply, model, provider, duration, errCode, errMessage, tokIn, tokOut) {
+  try {
+    fetch(AI_SB.url + '/rest/v1/ai_logs', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'apikey':AI_SB.key, 'Authorization':'Bearer '+AI_SB.key, 'Prefer':'return=minimal' },
+      body: JSON.stringify({
+        type: type, source: 'web', session_id: aiSession,
+        user_message: (userMsg||'').substring(0, 1000),
+        bot_reply: (botReply||'').substring(0, 2000),
+        model: model||'', provider: provider||'',
+        duration_ms: duration||0,
+        tokens_in: tokIn||0, tokens_out: tokOut||0,
+        error_code: errCode||'', error_message: (errMessage||'').substring(0, 1000),
+        page: location.pathname
+      })
+    });
+  } catch(e) {}
+}
+
+// ═══ СОХРАНЕНИЕ ЛИДА ═══
+async function saveLead(lead) {
+  var dir = lead.direction || 'Не указано';
+  var project = DIR_MAP[dir] || 'Сайты';
+  var dirId = 'DIR' + Date.now().toString(36).toUpperCase();
+  var h = { 'Content-Type':'application/json', 'apikey':AI_SB.key, 'Authorization':'Bearer '+AI_SB.key, 'Prefer':'return=minimal' };
+
+  try { await fetch(AI_SB.url+'/rest/v1/directions',{method:'POST',headers:h,body:JSON.stringify({id:dirId,name:lead.name,project:project,status:'Новый',stage:'prospect',phone:lead.phone,city:lead.city||'',description:lead.comment||'Заявка из ИИ-чата',source:'ИИ-чат ('+location.pathname+')'})}); } catch(e){}
+  try { await fetch(AI_SB.url+'/rest/v1/client_requests',{method:'POST',headers:h,body:JSON.stringify({name:lead.name,phone:lead.phone,direction:dir,city:lead.city||'',comment:lead.comment||'',source:'ai_chat',page:location.pathname,session_id:aiSession,status:'new'})}); } catch(e){}
+
+  var webhookUrl = aiCfg.n8n_webhook_url || 'https://daniyal2212.app.n8n.cloud/webhook/rkt-ai';
+  try { fetch(webhookUrl,{method:'POST',mode:'no-cors',body:JSON.stringify({action:'telegram_notify',chat_id:aiCfg.telegram_ceo_chat_id||'798494835',message:'\ud83c\udd95 Заявка с ИИ-чата!\n\n\ud83d\udc64 '+lead.name+'\n\ud83d\udcf1 '+lead.phone+'\n\ud83d\udccb '+dir+' → '+project+'\n\ud83c\udfd9 '+(lead.city||'—')+'\n\ud83d\udcac '+(lead.comment||'—')})}); } catch(e){}
+
+  aiLog('lead', lead.name+' | '+lead.phone, dir, '', '', 0, '', '');
+}
+
+</script>
+</body></html>

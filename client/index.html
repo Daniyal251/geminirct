@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>RKT HUB — Личный кабинет</title>
+<meta name="description" content="Личный кабинет клиента RKT HUB — проекты, заявки, правки">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0e17;--bg2:#111827;--bg3:#1a2234;--bg4:#1f2b3d;
+  --accent:#4dabf7;--accent2:#339af0;--accent-glow:rgba(77,171,247,0.12);
+  --green:#00d4aa;--green-glow:rgba(0,212,170,0.12);
+  --red:#ff6b6b;--orange:#ffa94d;--yellow:#ffd43b;--purple:#b197fc;--pink:#f06595;
+  --text:#e8ecf1;--text2:#8899aa;--text3:#5a6a7a;
+  --border:#243044;--border2:#2d3f56;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+  --shadow:0 4px 30px rgba(0,0,0,0.4);
+  --transition:all 0.2s ease;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ===== AUTH SCREEN ===== */
+.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px 32px;width:100%;max-width:420px;text-align:center}
+.auth-logo{font-size:40px;margin-bottom:12px}
+.auth-title{font-size:24px;font-weight:700;margin-bottom:4px}
+.auth-sub{color:var(--text2);font-size:13px;margin-bottom:28px}
+.auth-tabs{display:flex;gap:0;margin-bottom:24px;background:var(--bg);border-radius:var(--radius-sm);padding:3px}
+.auth-tab{flex:1;padding:10px;border:none;background:none;color:var(--text2);font-size:14px;font-weight:500;cursor:pointer;border-radius:6px;transition:var(--transition)}
+.auth-tab.active{background:var(--accent);color:#fff}
+.auth-input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:14px;margin-bottom:12px;outline:none;transition:border-color 0.2s}
+.auth-input:focus{border-color:var(--accent)}
+.auth-input::placeholder{color:var(--text3)}
+.auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:var(--transition)}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(77,171,247,0.3)}
+.auth-btn:active{transform:scale(0.98)}
+.auth-error{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.auth-link{color:var(--accent);font-size:13px;margin-top:16px;display:inline-block;cursor:pointer;text-decoration:none}
+.auth-link:hover{text-decoration:underline}
+.auth-back{position:absolute;top:20px;left:20px;color:var(--text2);text-decoration:none;font-size:14px;display:flex;align-items:center;gap:6px}
+.auth-back:hover{color:var(--text)}
+
+/* ===== APP LAYOUT ===== */
+.app{display:none}
+.app.active{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{font-size:16px;font-weight:700;color:var(--accent)}
+.topbar-user{font-size:13px;color:var(--text2)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text2);font-size:13px;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:6px}
+.topbar-btn:hover{border-color:var(--accent);color:var(--accent)}
+.notif-badge{background:var(--red);color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:600}
+
+/* ===== NAVIGATION ===== */
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nav-item{padding:14px 16px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:var(--transition)}
+.nav-item:hover{color:var(--text)}
+.nav-item.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ===== MAIN CONTENT ===== */
+.main{flex:1;padding:20px;max-width:1000px;margin:0 auto;width:100%}
+.page{display:none}
+.page.active{display:block}
+
+/* ===== DASHBOARD ===== */
+.dash-welcome{font-size:20px;font-weight:700;margin-bottom:4px}
+.dash-sub{color:var(--text2);font-size:13px;margin-bottom:24px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.stat-num{font-size:28px;font-weight:800}
+.stat-label{font-size:11px;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
+.stat-card--blue .stat-num{color:var(--accent)}
+.stat-card--green .stat-num{color:var(--green)}
+.stat-card--orange .stat-num{color:var(--orange)}
+.stat-card--purple .stat-num{color:var(--purple)}
+
+/* ===== PROJECT CARDS ===== */
+.section-title{font-size:16px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.project-list{display:flex;flex-direction:column;gap:12px}
+.project-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;cursor:pointer;transition:var(--transition)}
+.project-card:hover{border-color:var(--accent);transform:translateX(4px)}
+.pc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pc-name{font-size:15px;font-weight:600}
+.pc-badge{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600}
+.pc-badge--active{background:var(--green-glow);color:var(--green)}
+.pc-badge--done{background:var(--accent-glow);color:var(--accent)}
+.pc-badge--paused{background:rgba(255,169,77,0.12);color:var(--orange)}
+.pc-info{font-size:12px;color:var(--text2);display:flex;gap:16px;flex-wrap:wrap}
+.pc-progress{margin-top:10px;height:4px;background:var(--bg);border-radius:2px;overflow:hidden}
+.pc-progress-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--green));transition:width 0.5s}
+
+/* ===== REQUESTS ===== */
+.req-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:10px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(77,171,247,0.3)}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border);padding:10px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:var(--transition)}
+.btn-secondary:hover{border-color:var(--accent)}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+.filter-chip{padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;white-space:nowrap;transition:var(--transition)}
+.filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.req-list{display:flex;flex-direction:column;gap:10px}
+.req-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:var(--transition)}
+.req-card:hover{border-color:var(--accent)}
+.rc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.rc-title{font-size:14px;font-weight:600;flex:1}
+.rc-status{font-size:11px;padding:3px 8px;border-radius:12px;font-weight:600;white-space:nowrap}
+.rc-status--new{background:rgba(77,171,247,0.12);color:var(--accent)}
+.rc-status--in_progress{background:rgba(255,169,77,0.12);color:var(--orange)}
+.rc-status--done{background:var(--green-glow);color:var(--green)}
+.rc-status--closed{background:rgba(90,105,122,0.15);color:var(--text3)}
+.rc-status--seen{background:rgba(177,151,252,0.12);color:var(--purple)}
+.rc-status--review{background:rgba(255,213,59,0.12);color:var(--yellow)}
+.rc-meta{font-size:11px;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap}
+.rc-priority--urgent{color:var(--red) !important}
+.rc-priority--high{color:var(--orange) !important}
+.rc-desc{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ===== NEW REQUEST FORM ===== */
+.form-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.form-overlay.active{display:flex}
+.form-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto}
+.form-title{font-size:18px;font-weight:700;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.form-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color 0.2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-textarea{resize:vertical;min-height:100px}
+.form-select{appearance:none;cursor:pointer}
+.file-upload{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:20px;text-align:center;cursor:pointer;transition:var(--transition)}
+.file-upload:hover{border-color:var(--accent)}
+.file-upload-text{color:var(--text2);font-size:13px}
+.file-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.file-thumb{width:60px;height:60px;border-radius:6px;object-fit:cover;border:1px solid var(--border)}
+
+/* ===== REQUEST DETAIL ===== */
+.detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.detail-overlay.active{display:flex}
+.detail-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:600px;margin:40px auto}
+.detail-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.detail-meta{font-size:12px;color:var(--text2);margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap}
+.detail-desc{font-size:14px;line-height:1.6;margin-bottom:20px;padding:16px;background:var(--bg);border-radius:var(--radius-sm)}
+.detail-images{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.detail-img{width:120px;height:90px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer}
+.detail-messages{margin-top:20px}
+.msg{padding:10px 14px;border-radius:12px;margin-bottom:8px;max-width:85%;font-size:13px;line-height:1.5}
+.msg--client{background:var(--accent-glow);margin-left:auto;border-bottom-right-radius:4px}
+.msg--staff{background:var(--bg3);border-bottom-left-radius:4px}
+.msg--ai{background:rgba(177,151,252,0.1);border-bottom-left-radius:4px}
+.msg-sender{font-size:10px;color:var(--text3);margin-bottom:2px}
+.msg-time{font-size:10px;color:var(--text3);margin-top:2px}
+.detail-reply{display:flex;gap:8px;margin-top:16px}
+.detail-reply input{flex:1}
+
+/* ===== AI ASSISTANT ===== */
+.ai-screen{display:none;flex-direction:column;height:calc(100vh - 110px)}
+.ai-screen.active{display:flex}
+.ai-chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.ai-welcome{text-align:center;padding:40px 20px;color:var(--text2)}
+.ai-welcome h3{font-size:18px;color:var(--text);margin-bottom:8px}
+.ai-welcome p{font-size:13px;line-height:1.6}
+.ai-msg{max-width:85%;padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.6}
+.ai-msg--user{background:var(--accent);color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+.ai-msg--ai{background:var(--bg2);border:1px solid var(--border);border-bottom-left-radius:4px}
+.ai-input-row{padding:16px 20px;background:var(--bg2);border-top:1px solid var(--border);display:flex;gap:8px}
+.ai-input{flex:1;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:24px;color:var(--text);font-size:14px;outline:none}
+.ai-input:focus{border-color:var(--accent)}
+.ai-send{width:44px;height:44px;border-radius:22px;background:var(--accent);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ai-send:hover{background:var(--accent2)}
+.ai-typing{padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;border-bottom-left-radius:4px;display:none;max-width:120px}
+.ai-typing.show{display:block}
+.ai-typing span{display:inline-block;width:6px;height:6px;background:var(--text3);border-radius:50%;margin:0 2px;animation:typeDot 1.4s infinite}
+.ai-typing span:nth-child(2){animation-delay:0.2s}
+.ai-typing span:nth-child(3){animation-delay:0.4s}
+@keyframes typeDot{0%,60%,100%{opacity:0.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* ===== EMPTY STATE ===== */
+.empty{text-align:center;padding:40px 20px;color:var(--text2)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-text{font-size:14px;margin-bottom:16px}
+
+/* ===== NOTIFICATIONS ===== */
+.notif-panel{position:fixed;top:0;right:-360px;width:360px;max-width:100%;height:100vh;background:var(--bg2);border-left:1px solid var(--border);z-index:300;transition:right 0.3s;overflow-y:auto;padding:20px}
+.notif-panel.open{right:0}
+.notif-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.notif-item{padding:12px;background:var(--bg);border-radius:var(--radius-sm);font-size:13px;border-left:3px solid var(--accent)}
+.notif-item.unread{border-left-color:var(--orange);background:rgba(255,169,77,0.05)}
+.notif-time{font-size:11px;color:var(--text3);margin-top:4px}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg3);color:var(--text);padding:12px 24px;border-radius:var(--radius-sm);font-size:14px;z-index:999;display:none;border:1px solid var(--border);box-shadow:var(--shadow)}
+.toast.show{display:block;animation:toastIn 0.3s}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Mobile */
+@media(max-width:640px){
+  .topbar{padding:10px 14px}
+  .main{padding:14px}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .auth-box{padding:28px 20px}
+  .form-box{padding:20px}
+  .notif-panel{width:100%}
+}
+
+</style>
+</head>
+<body>
+
+<a href="/" class="auth-back">← На главную</a>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen" class="auth-screen" style="display:none">
+  <div class="auth-box">
+    <div class="auth-logo">🏢</div>
+    <div class="auth-title">Личный кабинет</div>
+    <div class="auth-sub">Клиентский портал RKT HUB</div>
+    
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login" onclick="switchAuthTab('login')">Вход</button>
+      <button class="auth-tab" data-tab="register" onclick="switchAuthTab('register')">Регистрация</button>
+    </div>
+    
+    <div id="auth-login-form">
+      <input class="auth-input" id="login-phone" type="tel" placeholder="Телефон" autocomplete="tel">
+      <input class="auth-input" id="login-pass" type="password" placeholder="Пароль" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="auth-btn" onclick="doLogin()">Войти</button>
+    </div>
+    
+    <div id="auth-register-form" style="display:none">
+      <input class="auth-input" id="reg-name" type="text" placeholder="Ваше имя">
+      <input class="auth-input" id="reg-phone" type="tel" placeholder="Телефон">
+      <input class="auth-input" id="reg-email" type="email" placeholder="Email (необязательно)">
+      <input class="auth-input" id="reg-pass" type="password" placeholder="Придумайте пароль">
+      <button class="auth-btn" onclick="doRegister()">Зарегистрироваться</button>
+    </div>
+    
+    <div class="auth-error"></div>
+    <a class="auth-link" href="/order">🚀 Заказать сайт</a>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">RKT HUB</span>
+      <span class="topbar-user"></span>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="toggleNotifications()">🔔 <span class="notif-badge" style="display:none">0</span></button>
+      <button class="topbar-btn" onclick="logout()">Выход</button>
+    </div>
+  </div>
+  
+  <!-- Navigation -->
+  <div class="nav">
+    <div class="nav-item active" data-nav="dashboard" onclick="navigateTo('dashboard')">📊 Главная</div>
+    <div class="nav-item" data-nav="projects" onclick="navigateTo('projects')">📁 Проекты</div>
+    <div class="nav-item" data-nav="requests" onclick="navigateTo('requests')">📋 Заявки</div>
+    <div class="nav-item" data-nav="ai" onclick="navigateTo('ai')">🤖 ИИ-помощник</div>
+  </div>
+  
+  <!-- Main -->
+  <div class="main">
+    <!-- Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-welcome" id="dash-greeting">Добро пожаловать!</div>
+      <div class="dash-sub">Здесь вы видите свои проекты и заявки</div>
+      <div class="stats-row">
+        <div class="stat-card stat-card--blue"><div class="stat-num" id="stat-projects">0</div><div class="stat-label">Проектов</div></div>
+        <div class="stat-card stat-card--green"><div class="stat-num" id="stat-active">0</div><div class="stat-label">Активных</div></div>
+        <div class="stat-card stat-card--purple"><div class="stat-num" id="stat-requests">0</div><div class="stat-label">Заявок</div></div>
+        <div class="stat-card stat-card--orange"><div class="stat-num" id="stat-open">0</div><div class="stat-label">Открытых</div></div>
+      </div>
+      <div class="section-title">📁 Мои проекты</div>
+      <div class="project-list" id="dash-projects"></div>
+    </div>
+    
+    <!-- Projects -->
+    <div class="page" id="page-projects">
+      <div class="section-title">📁 Все проекты</div>
+      <div class="project-list" id="projects-list"></div>
+    </div>
+    
+    <!-- Requests -->
+    <div class="page" id="page-requests">
+      <div class="req-header">
+        <div class="section-title" style="margin:0">📋 Заявки на правки</div>
+        <button class="btn-primary" onclick="openNewRequest()">+ Новая заявка</button>
+      </div>
+      <div class="filter-row">
+        <button class="filter-chip active" data-filter="all" onclick="setFilter('all')">Все</button>
+        <button class="filter-chip" data-filter="new" onclick="setFilter('new')">Новые</button>
+        <button class="filter-chip" data-filter="in_progress" onclick="setFilter('in_progress')">В работе</button>
+        <button class="filter-chip" data-filter="done" onclick="setFilter('done')">Выполнено</button>
+        <button class="filter-chip" data-filter="closed" onclick="setFilter('closed')">Закрыто</button>
+      </div>
+      <div class="req-list" id="requests-list"></div>
+    </div>
+    
+    <!-- AI -->
+    <div class="page" id="page-ai">
+      <div class="ai-screen active">
+        <div class="ai-chat" id="ai-messages"></div>
+        <div class="ai-typing" id="ai-typing"><span></span><span></span><span></span></div>
+        <div class="ai-input-row">
+          <input class="ai-input" id="ai-input" placeholder="Опишите правку..." onkeydown="if(event.key==='Enter')sendAIMessage()">
+          <button class="ai-send" onclick="sendAIMessage()">↑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Request Form -->
+<div class="form-overlay" id="new-request-form">
+  <div class="form-box">
+    <div class="form-title">📝 Новая заявка <button class="form-close" onclick="closeNewRequest()">✕</button></div>
+    <div class="form-group">
+      <label class="form-label">Проект</label>
+      <select class="form-select" id="req-project"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Тип</label>
+      <select class="form-select" id="req-type">
+        <option value="edit">✏️ Правка</option>
+        <option value="bug">🐛 Баг / Ошибка</option>
+        <option value="feature">✨ Новая функция</option>
+        <option value="question">❓ Вопрос</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Заголовок *</label>
+      <input class="form-input" id="req-title" placeholder="Кратко опишите что нужно">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Подробное описание</label>
+      <textarea class="form-textarea" id="req-desc" placeholder="Расскажите подробнее что изменить, где именно, как должно выглядеть..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Приоритет</label>
+      <select class="form-select" id="req-priority">
+        <option value="low">Низкий — не срочно</option>
+        <option value="medium" selected>Средний</option>
+        <option value="high">Высокий — нужно скорее</option>
+        <option value="urgent">Срочный — горит!</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Скриншоты</label>
+      <div class="file-upload" onclick="document.getElementById('req-files').click()">
+        <div class="file-upload-text">📎 Нажмите чтобы прикрепить фото</div>
+      </div>
+      <input type="file" id="req-files" multiple accept="image/*" style="display:none" onchange="handleFileUpload(event)">
+      <div class="file-preview" id="req-files-preview"></div>
+    </div>
+    <button class="btn-primary" style="width:100%" onclick="submitRequest()">Отправить заявку</button>
+  </div>
+</div>
+
+<!-- Detail overlay -->
+<div class="detail-overlay" id="detail-overlay" onclick="if(event.target===this)closeDetail()"></div>
+
+<!-- Notifications panel -->
+<div class="notif-panel" id="notif-panel">
+  <div class="form-title">🔔 Уведомления <button class="form-close" onclick="toggleNotifications()">✕</button></div>
+  <div class="notif-list" id="notif-list"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+
+const CONFIG = {
+  SUPABASE_URL: 'https://prparzgqevfelwsndmkc.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_gFeXATQGYxKx08BpeOedZg_7buTwVJq',
+  AI_URL: 'https://daniyal2212.app.n8n.cloud/webhook/rkt-ai'
+};
+
+let SB = null;
+try { SB = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY); } catch(e) { console.error('Supabase error:', e); }
+
+let CLIENT = null; // current logged-in client
+let CLIENT_DATA = { projects: [], requests: [], notifications: [] };
+
+// ===== STATUS MAPS =====
+const STATUS_MAP = {
+  new: 'Новая', seen: 'Просмотрена', in_progress: 'В работе',
+  review: 'На проверке', done: 'Выполнено', closed: 'Закрыта'
+};
+const STATUS_CSS = {
+  new: 'rc-status--new', seen: 'rc-status--seen', in_progress: 'rc-status--in_progress',
+  review: 'rc-status--review', done: 'rc-status--done', closed: 'rc-status--closed'
+};
+const PRIORITY_MAP = { low: 'Низкий', medium: 'Средний', high: 'Высокий', urgent: 'Срочный' };
+const TYPE_MAP = { edit: '✏️ Правка', bug: '🐛 Баг', feature: '✨ Новое', question: '❓ Вопрос' };
+const STAGE_MAP = {
+  prospect: 'Поиск', contact: 'Контакт', interest: 'Интерес',
+  proto: 'Прототип', proposal: 'КП', negotiation: 'Переговоры',
+  payment: 'Оплата', done: 'Сдан', lost: 'Отказ'
+};
+const STAGE_PROGRESS = {
+  prospect: 5, contact: 10, interest: 20, proto: 40,
+  proposal: 60, negotiation: 75, payment: 90, done: 100, lost: 0
+};
+
+// ===== PHONE NORMALIZATION =====
+function normalizePhone(p) {
+  if (!p) return '';
+  const d = p.replace(/\D/g, '');
+  if (d.length === 11 && d[0] === '8') return '7' + d.slice(1);
+  if (d.length === 11) return d;
+  if (d.length === 10) return '7' + d;
+  return d;
+}
+
+// ===== AUTH =====
+function initAuth() {
+  // Check saved session
+  const saved = localStorage.getItem('rkt_client');
+  if (saved) {
+    try {
+      CLIENT = JSON.parse(saved);
+      showApp();
+      return;
+    } catch(e) {}
+  }
+  // Check token in URL
+  const params = new URLSearchParams(location.search);
+  const token = params.get('token');
+  if (token) { loginByToken(token); return; }
+  
+  document.getElementById('auth-screen').style.display = '';
+}
+
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById('auth-login-form').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('auth-register-form').style.display = tab === 'register' ? '' : 'none';
+  hideError();
+}
+
+async function doLogin() {
+  const phoneRaw = document.getElementById('login-phone').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!phoneRaw || !pass) return showError('Введите телефон и пароль');
+
+  const hash = await sha256(pass);
+  const normPhone = normalizePhone(phoneRaw);
+  // Пробуем и нормализованный и оригинальный номер
+  var { data, error } = await SB.from('clients').select('*').eq('phone', normPhone).eq('password_hash', hash).single();
+  if (!data && normPhone !== phoneRaw) {
+    var res = await SB.from('clients').select('*').eq('phone', phoneRaw).eq('password_hash', hash).single();
+    data = res.data; error = res.error;
+  }
+  if (error || !data) return showError('Неверный телефон или пароль');
+  
+  CLIENT = data;
+  await SB.from('clients').update({ last_login: new Date().toISOString() }).eq('id', data.id);
+  localStorage.setItem('rkt_client', JSON.stringify(data));
+  showApp();
+}
+
+async function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  
+  if (!name || !phone || !pass) return showError('Заполните имя, телефон и пароль');
+  if (pass.length < 4) return showError('Пароль минимум 4 символа');
+  
+  const hash = await sha256(pass);
+
+  // Нормализуем телефон для проверки дубликатов
+  const normPhone = normalizePhone(phone);
+  const phoneToSave = normPhone || phone;
+
+  // Check if exists — загружаем все и сравниваем нормализованные номера
+  const { data: allClients } = await SB.from('clients').select('id, phone');
+  const dup = (allClients || []).find(function(c) {
+    return normalizePhone(c.phone) === phoneToSave;
+  });
+  if (dup) return showError('Этот телефон уже зарегистрирован');
+
+  const { data, error } = await SB.from('clients').insert({
+    name, phone: phoneToSave, email: email || null, password_hash: hash
+  }).select().single();
+  
+  if (error) return showError('Ошибка: ' + error.message);
+  
+  CLIENT = data;
+  localStorage.setItem('rkt_client', JSON.stringify(data));
+  
+  // Auto-link projects by phone (normalized matching)
+  const normPhone = normalizePhone(phone);
+  if (normPhone) {
+    const { data: unlinked } = await SB.from('directions').select('id, phone').is('client_id', null);
+    if (unlinked) {
+      const matched = unlinked.filter(function(d) { return normalizePhone(d.phone) === normPhone; });
+      for (var k = 0; k < matched.length; k++) {
+        await SB.from('directions').update({ client_id: data.id }).eq('id', matched[k].id);
+      }
+    }
+  }
+  
+  showApp();
+  showToast('Регистрация успешна!');
+}
+
+async function loginByToken(token) {
+  const { data: dir } = await SB.from('directions').select('*, clients(*)').eq('client_token', token).single();
+  if (dir && dir.clients) {
+    CLIENT = dir.clients;
+    localStorage.setItem('rkt_client', JSON.stringify(CLIENT));
+    showApp();
+  } else if (dir) {
+    // Direction exists but no client — show register with prefilled
+    document.getElementById('auth-screen').style.display = '';
+    switchAuthTab('register');
+    if (dir.phone) document.getElementById('reg-phone').value = dir.phone;
+    if (dir.client_name) document.getElementById('reg-name').value = dir.client_name;
+  } else {
+    document.getElementById('auth-screen').style.display = '';
+    showError('Токен не найден');
+  }
+}
+
+function logout() {
+  CLIENT = null;
+  CLIENT_DATA = { projects: [], requests: [], notifications: [] };
+  localStorage.removeItem('rkt_client');
+  document.querySelector('.app').classList.remove('active');
+  document.getElementById('auth-screen').style.display = '';
+  document.getElementById('login-phone').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function showError(msg) {
+  const el = document.querySelector('.auth-error');
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideError() {
+  document.querySelector('.auth-error').style.display = 'none';
+}
+
+// ===== APP =====
+async function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.querySelector('.app').classList.add('active');
+  document.querySelector('.topbar-user').textContent = CLIENT.name;
+  await loadClientData();
+  renderDashboard();
+  navigateTo('dashboard');
+  setupRealtime();
+}
+
+async function loadClientData() {
+  if (!CLIENT) return;
+  
+  // Load projects
+  const { data: dirs } = await SB.from('directions').select('*').eq('client_id', CLIENT.id);
+  CLIENT_DATA.projects = dirs || [];
+  
+  // Also check by phone (normalized matching, in case not linked yet)
+  if (CLIENT.phone) {
+    const clientNorm = normalizePhone(CLIENT.phone);
+    if (clientNorm) {
+      const { data: unlinkedDirs } = await SB.from('directions').select('*').is('client_id', null);
+      if (unlinkedDirs && unlinkedDirs.length > 0) {
+        const phoneDirs = unlinkedDirs.filter(function(d) { return normalizePhone(d.phone) === clientNorm; });
+        for (var j = 0; j < phoneDirs.length; j++) {
+          await SB.from('directions').update({ client_id: CLIENT.id }).eq('id', phoneDirs[j].id);
+        }
+        if (phoneDirs.length > 0) {
+          CLIENT_DATA.projects = CLIENT_DATA.projects.concat(phoneDirs);
+        }
+      }
+    }
+  }
+
+  // Also check by client_name (fallback for directions with no phone)
+  if (CLIENT.name) {
+    const { data: nameDirs } = await SB.from('directions').select('*').eq('client_name', CLIENT.name).is('client_id', null);
+    if (nameDirs && nameDirs.length > 0) {
+      var existingIds = {};
+      for (var ei = 0; ei < CLIENT_DATA.projects.length; ei++) existingIds[CLIENT_DATA.projects[ei].id] = true;
+      for (var ni = 0; ni < nameDirs.length; ni++) {
+        if (!existingIds[nameDirs[ni].id]) {
+          await SB.from('directions').update({ client_id: CLIENT.id }).eq('id', nameDirs[ni].id);
+          CLIENT_DATA.projects.push(nameDirs[ni]);
+        }
+      }
+    }
+  }
+  
+  // Load requests
+  const { data: reqs } = await SB.from('client_requests').select('*').eq('client_id', CLIENT.id).order('created_at', { ascending: false });
+  CLIENT_DATA.requests = reqs || [];
+  
+  // Load notifications
+  const { data: notifs } = await SB.from('client_notifications').select('*').eq('client_id', CLIENT.id).order('created_at', { ascending: false }).limit(20);
+  CLIENT_DATA.notifications = notifs || [];
+  
+  // Update notif badge
+  const unread = (notifs || []).filter(n => !n.is_read).length;
+  const badge = document.querySelector('.notif-badge');
+  if (unread > 0) { badge.textContent = unread; badge.style.display = ''; }
+  else { badge.style.display = 'none'; }
+}
+
+// ===== NAVIGATION =====
+function navigateTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  const nav = document.querySelector(`[data-nav="${page}"]`);
+  if (nav) nav.classList.add('active');
+  
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'projects') renderProjects();
+  if (page === 'requests') renderRequests();
+  if (page === 'ai') initAI();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  const projects = CLIENT_DATA.projects;
+  const requests = CLIENT_DATA.requests;
+  const active = projects.filter(p => p.stage && p.stage !== 'done' && p.stage !== 'lost');
+  const openReqs = requests.filter(r => !['done','closed'].includes(r.status));
+  
+  document.getElementById('stat-projects').textContent = projects.length;
+  document.getElementById('stat-active').textContent = active.length;
+  document.getElementById('stat-requests').textContent = requests.length;
+  document.getElementById('stat-open').textContent = openReqs.length;
+  
+  // Recent projects
+  const container = document.getElementById('dash-projects');
+  if (projects.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📁</div><div class="empty-text">У вас пока нет проектов</div><button class="btn-primary" onclick="location.href=\'/order\'">Заказать сайт</button></div>';
+    return;
+  }
+  container.innerHTML = projects.slice(0, 3).map(p => projectCardHTML(p)).join('');
+}
+
+function projectCardHTML(p) {
+  const stage = STAGE_MAP[p.stage] || p.stage || '—';
+  const progress = STAGE_PROGRESS[p.stage] || 0;
+  const badgeCls = p.stage === 'done' ? 'pc-badge--done' : p.stage === 'lost' ? 'pc-badge--paused' : 'pc-badge--active';
+  return `<div class="project-card" onclick="showProjectDetail(${p.id})">
+    <div class="pc-top">
+      <div class="pc-name">${p.name || 'Проект #'+p.id}</div>
+      <span class="pc-badge ${badgeCls}">${stage}</span>
+    </div>
+    <div class="pc-info">
+      <span>📋 ${p.site_type || 'Сайт'}</span>
+      ${p.manager ? '<span>👤 ' + p.manager + '</span>' : ''}
+      ${p.price ? '<span>💰 ' + Number(p.price).toLocaleString('ru') + '₽</span>' : ''}
+    </div>
+    <div class="pc-progress"><div class="pc-progress-bar" style="width:${progress}%"></div></div>
+  </div>`;
+}
+
+// ===== PROJECTS =====
+function renderProjects() {
+  const container = document.getElementById('projects-list');
+  const projects = CLIENT_DATA.projects;
+  if (projects.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📁</div><div class="empty-text">У вас пока нет проектов.<br>Закажите сайт — и он появится здесь.</div><button class="btn-primary" onclick="location.href=\'/order\'">Заказать сайт</button></div>';
+    return;
+  }
+  container.innerHTML = projects.map(p => projectCardHTML(p)).join('');
+}
+
+function showProjectDetail(id) {
+  const p = CLIENT_DATA.projects.find(pr => pr.id === id);
+  if (!p) return;
+  const progress = STAGE_PROGRESS[p.stage] || 0;
+  const stage = STAGE_MAP[p.stage] || p.stage || '—';
+  
+  const html = `<div class="detail-box">
+    <div class="form-title">${p.name || 'Проект #'+p.id} <button class="form-close" onclick="closeDetail()">✕</button></div>
+    <div class="pc-info" style="margin-bottom:16px">
+      <span>📋 ${p.site_type || '—'}</span>
+      <span>📊 ${stage} (${progress}%)</span>
+      ${p.manager ? '<span>👤 ' + p.manager + '</span>' : ''}
+      ${p.price ? '<span>💰 ' + Number(p.price).toLocaleString('ru') + '₽</span>' : ''}
+      ${p.paid ? '<span>✅ Оплачено</span>' : ''}
+    </div>
+    <div class="pc-progress" style="margin-bottom:20px"><div class="pc-progress-bar" style="width:${progress}%"></div></div>
+    ${p.link ? '<a href="'+p.link+'" target="_blank" style="color:var(--accent);font-size:13px">🔗 Открыть сайт</a>' : ''}
+    ${p.description ? '<div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;color:var(--text2)">'+p.description+'</div>' : ''}
+    <div style="margin-top:20px;display:flex;gap:8px">
+      <button class="btn-primary" onclick="closeDetail();openNewRequest(${p.id})">📝 Создать заявку</button>
+      <button class="btn-secondary" onclick="closeDetail();navigateTo('ai')">🤖 Спросить ИИ</button>
+    </div>
+  </div>`;
+  
+  const overlay = document.getElementById('detail-overlay');
+  overlay.innerHTML = html;
+  overlay.classList.add('active');
+}
+
+function closeDetail() {
+  document.getElementById('detail-overlay').classList.remove('active');
+}
+
+// ===== REQUESTS =====
+let currentFilter = 'all';
+
+function renderRequests() {
+  const reqs = CLIENT_DATA.requests;
+  const filtered = currentFilter === 'all' ? reqs : reqs.filter(r => r.status === currentFilter);
+  
+  const container = document.getElementById('requests-list');
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">' + 
+      (reqs.length === 0 ? 'У вас пока нет заявок' : 'Нет заявок с таким статусом') + '</div></div>';
+    return;
+  }
+  container.innerHTML = filtered.map(r => {
+    const proj = CLIENT_DATA.projects.find(p => p.id === r.direction_id);
+    const date = new Date(r.created_at).toLocaleDateString('ru');
+    return `<div class="req-card" onclick="showRequestDetail(${r.id})">
+      <div class="rc-top">
+        <div class="rc-title">${r.title}</div>
+        <span class="rc-status ${STATUS_CSS[r.status] || ''}">${STATUS_MAP[r.status] || r.status}</span>
+      </div>
+      <div class="rc-meta">
+        <span>${TYPE_MAP[r.type] || r.type}</span>
+        <span class="rc-priority--${r.priority}">${PRIORITY_MAP[r.priority] || r.priority}</span>
+        ${proj ? '<span>📁 ' + (proj.name || 'Проект #'+proj.id) + '</span>' : ''}
+        <span>📅 ${date}</span>
+      </div>
+      ${r.description ? '<div class="rc-desc">' + r.description + '</div>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function setFilter(status) {
+  currentFilter = status;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === status));
+  renderRequests();
+}
+
+// ===== NEW REQUEST =====
+function openNewRequest(dirId) {
+  const form = document.getElementById('new-request-form');
+  form.classList.add('active');
+  
+  // Populate project select
+  const sel = document.getElementById('req-project');
+  sel.innerHTML = '<option value="">Выберите проект</option>' +
+    CLIENT_DATA.projects.map(p => `<option value="${p.id}" ${p.id === dirId ? 'selected' : ''}>${p.name || 'Проект #'+p.id}</option>`).join('');
+  
+  document.getElementById('req-title').value = '';
+  document.getElementById('req-desc').value = '';
+  document.getElementById('req-type').value = 'edit';
+  document.getElementById('req-priority').value = 'medium';
+  document.getElementById('req-files-preview').innerHTML = '';
+  window._reqFiles = [];
+}
+
+function closeNewRequest() {
+  document.getElementById('new-request-form').classList.remove('active');
+}
+
+async function handleFileUpload(e) {
+  const files = Array.from(e.target.files);
+  const preview = document.getElementById('req-files-preview');
+  window._reqFiles = window._reqFiles || [];
+  
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      preview.innerHTML += `<img class="file-thumb" src="${ev.target.result}">`;
+    };
+    reader.readAsDataURL(file);
+    window._reqFiles.push(file);
+  }
+}
+
+async function submitRequest() {
+  const title = document.getElementById('req-title').value.trim();
+  const desc = document.getElementById('req-desc').value.trim();
+  const type = document.getElementById('req-type').value;
+  const priority = document.getElementById('req-priority').value;
+  const dirId = document.getElementById('req-project').value;
+  
+  if (!title) return showToast('Укажите заголовок заявки');
+  
+  // Upload screenshots
+  let screenshots = [];
+  if (window._reqFiles && window._reqFiles.length > 0) {
+    for (const file of window._reqFiles) {
+      const path = `${CLIENT.id}/${Date.now()}_${file.name}`;
+      const { data } = await SB.storage.from('client-files').upload(path, file);
+      if (data) {
+        const { data: urlData } = SB.storage.from('client-files').getPublicUrl(path);
+        screenshots.push(urlData.publicUrl);
+      }
+    }
+  }
+  
+  const { data, error } = await SB.from('client_requests').insert({
+    client_id: CLIENT.id,
+    direction_id: dirId ? parseInt(dirId) : null,
+    type, title, description: desc, priority,
+    screenshots: JSON.stringify(screenshots)
+  }).select().single();
+  
+  if (error) return showToast('Ошибка: ' + error.message);
+  
+  closeNewRequest();
+  showToast('Заявка #' + data.id + ' создана!');
+  await loadClientData();
+  renderRequests();
+}
+
+// ===== REQUEST DETAIL =====
+async function showRequestDetail(id) {
+  const r = CLIENT_DATA.requests.find(req => req.id === id);
+  if (!r) return;
+  
+  const proj = CLIENT_DATA.projects.find(p => p.id === r.direction_id);
+  const date = new Date(r.created_at).toLocaleString('ru');
+  let screenshots = [];
+  try { screenshots = JSON.parse(r.screenshots || '[]'); } catch(e) {}
+  
+  // Load messages
+  const { data: messages } = await SB.from('request_messages').select('*').eq('request_id', id).order('created_at', { ascending: true });
+  
+  let html = `<div class="detail-box">
+    <div class="form-title">Заявка #${r.id} <button class="form-close" onclick="closeDetail()">✕</button></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <span class="rc-status ${STATUS_CSS[r.status] || ''}">${STATUS_MAP[r.status] || r.status}</span>
+      <span style="font-size:12px;color:var(--text2)">${TYPE_MAP[r.type] || r.type}</span>
+      <span style="font-size:12px;color:var(--text2)">Приоритет: ${PRIORITY_MAP[r.priority]}</span>
+    </div>
+    <h3 style="font-size:16px;margin-bottom:4px">${r.title}</h3>
+    <div class="detail-meta">
+      ${proj ? '<span>📁 ' + (proj.name || 'Проект') + '</span>' : ''}
+      <span>📅 ${date}</span>
+    </div>
+    ${r.description ? '<div class="detail-desc">' + r.description + '</div>' : ''}
+    ${screenshots.length > 0 ? '<div class="detail-images">' + screenshots.map(s => `<img class="detail-img" src="${s}" onclick="window.open('${s}','_blank')">`).join('') + '</div>' : ''}
+    ${r.staff_comment ? '<div style="padding:12px;background:var(--green-glow);border-radius:8px;font-size:13px;margin-bottom:16px"><b>Комментарий:</b> ' + r.staff_comment + '</div>' : ''}`;
+  
+  if (messages && messages.length > 0) {
+    html += '<div class="section-title" style="margin-top:16px">💬 Сообщения</div><div class="detail-messages">';
+    for (const m of messages) {
+      const cls = m.sender_type === 'client' ? 'msg--client' : m.sender_type === 'ai' ? 'msg--ai' : 'msg--staff';
+      const sender = m.sender_type === 'client' ? 'Вы' : m.sender_type === 'ai' ? '🤖 ИИ' : '👨‍💼 Менеджер';
+      const time = new Date(m.created_at).toLocaleString('ru');
+      html += `<div class="msg ${cls}"><div class="msg-sender">${sender}</div>${m.content}<div class="msg-time">${time}</div></div>`;
+    }
+    html += '</div>';
+  }
+  
+  // Reply form (only if not closed)
+  if (!['done','closed'].includes(r.status)) {
+    html += `<div class="detail-reply">
+      <input class="form-input" id="reply-input" placeholder="Написать сообщение..." onkeydown="if(event.key==='Enter')sendReply(${r.id})">
+      <button class="btn-primary" onclick="sendReply(${r.id})">↑</button>
+    </div>`;
+  }
+  
+  html += '</div>';
+  
+  const overlay = document.getElementById('detail-overlay');
+  overlay.innerHTML = html;
+  overlay.classList.add('active');
+}
+
+async function sendReply(reqId) {
+  const input = document.getElementById('reply-input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  await SB.from('request_messages').insert({
+    request_id: reqId, sender_type: 'client', sender_id: CLIENT.id, content: text
+  });
+  
+  input.value = '';
+  showRequestDetail(reqId); // refresh
+}
+
+// ===== AI ASSISTANT =====
+let aiHistory = [];
+
+function initAI() {
+  if (aiHistory.length === 0) {
+    document.getElementById('ai-messages').innerHTML = `
+      <div class="ai-welcome">
+        <h3>🤖 ИИ-ассистент</h3>
+        <p>Опишите что хотите изменить на сайте — я помогу<br>сформулировать заявку и отправлю её команде.</p>
+        <p style="margin-top:12px;font-size:12px;color:var(--text3)">Примеры: «Измени цвет шапки на синий», «Добавь кнопку звонка», «На главной странице фото устарело»</p>
+      </div>`;
+  }
+}
+
+async function sendAIMessage() {
+  const input = document.getElementById('ai-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  
+  const container = document.getElementById('ai-messages');
+  // Remove welcome
+  const welcome = container.querySelector('.ai-welcome');
+  if (welcome) welcome.remove();
+  
+  // Add user message
+  container.innerHTML += `<div class="ai-msg ai-msg--user">${escapeHtml(text)}</div>`;
+  
+  // Show typing
+  const typing = document.getElementById('ai-typing');
+  typing.classList.add('show');
+  container.scrollTop = container.scrollHeight;
+  
+  aiHistory.push({ role: 'user', content: text });
+  
+  try {
+    const projectsCtx = CLIENT_DATA.projects.map(p => `${p.name||'Проект #'+p.id} (${p.site_type||'сайт'}, этап: ${STAGE_MAP[p.stage]||p.stage})`).join(', ');
+    
+    const res = await fetch(CONFIG.AI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: text,
+        context: `Клиент: ${CLIENT.name}. Проекты: ${projectsCtx || 'нет'}. Помоги сформулировать заявку на правку сайта. Если клиент описал правку достаточно подробно, предложи создать заявку.`,
+        history: aiHistory.slice(-6)
+      })
+    });
+    
+    const data = await res.json();
+    const reply = data.output || data.text || data.message || 'Не удалось получить ответ';
+    
+    typing.classList.remove('show');
+    container.innerHTML += `<div class="ai-msg ai-msg--ai">${reply}</div>`;
+    aiHistory.push({ role: 'assistant', content: reply });
+    
+    // Check if AI suggests creating a request
+    if (reply.includes('создать заявку') || reply.includes('оформить заявку')) {
+      container.innerHTML += `<div style="text-align:center;padding:8px"><button class="btn-primary" onclick="aiCreateRequest()">📝 Создать заявку</button></div>`;
+    }
+  } catch(e) {
+    typing.classList.remove('show');
+    container.innerHTML += `<div class="ai-msg ai-msg--ai" style="color:var(--red)">Ошибка соединения. Попробуйте позже.</div>`;
+  }
+  
+  container.scrollTop = container.scrollHeight;
+}
+
+function aiCreateRequest() {
+  // Extract last conversation as description
+  const lastMsgs = aiHistory.slice(-4).map(m => `${m.role === 'user' ? 'Клиент' : 'ИИ'}: ${m.content}`).join('\n');
+  
+  openNewRequest(CLIENT_DATA.projects[0]?.id);
+  document.getElementById('req-title').value = 'Правка по обсуждению с ИИ';
+  document.getElementById('req-desc').value = lastMsgs;
+}
+
+// ===== NOTIFICATIONS =====
+function toggleNotifications() {
+  const panel = document.getElementById('notif-panel');
+  panel.classList.toggle('open');
+  
+  if (panel.classList.contains('open')) {
+    const list = document.getElementById('notif-list');
+    if (CLIENT_DATA.notifications.length === 0) {
+      list.innerHTML = '<div class="empty"><div class="empty-icon">🔔</div><div class="empty-text">Нет уведомлений</div></div>';
+      return;
+    }
+    list.innerHTML = CLIENT_DATA.notifications.map(n => {
+      const time = new Date(n.created_at).toLocaleString('ru');
+      return `<div class="notif-item ${n.is_read ? '' : 'unread'}">${n.title}${n.body ? '<br><span style="color:var(--text2);font-size:12px">' + n.body + '</span>' : ''}<div class="notif-time">${time}</div></div>`;
+    }).join('');
+    
+    // Mark as read
+    const unreadIds = CLIENT_DATA.notifications.filter(n => !n.is_read).map(n => n.id);
+    if (unreadIds.length > 0) {
+      SB.from('client_notifications').update({ is_read: true }).in('id', unreadIds).then(() => {
+        document.querySelector('.notif-badge').style.display = 'none';
+      });
+    }
+  }
+}
+
+// ===== REALTIME =====
+function setupRealtime() {
+  if (!SB || !CLIENT) return;
+  SB.channel('client-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'client_requests', filter: `client_id=eq.${CLIENT.id}` }, () => { loadClientData().then(() => renderRequests()); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'client_notifications', filter: `client_id=eq.${CLIENT.id}` }, () => loadClientData())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'directions', filter: `client_id=eq.${CLIENT.id}` }, () => { loadClientData().then(() => renderProjects()); })
+    .subscribe();
+}
+
+// ===== UTILS =====
+function escapeHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  initAuth();
+});
+
+</script>
+</body>
+</html>
