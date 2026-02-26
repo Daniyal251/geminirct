@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"c:/Users/wuqqr/Desktop/РКТ/geminirct/find_bg1.ps1\")",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"./find_bg1.ps1\")",
+      "Bash(xxd)"
+    ]
+  }
+}

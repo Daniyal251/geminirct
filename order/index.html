@@ -1,0 +1,1412 @@
+<!DOCTYPE html><html lang="ru"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0">
+<title>Заказать — RCT</title>
+<meta name="description" content="Оформите заявку на разработку сайта, AI-контент, ИИ-агента или консультацию по медоборудованию.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#060a14;--bg2:#0c1220;--bg3:#121a2c;--bg4:#1a2540;
+--accent:#00e5a0;--accent2:#00c48c;
+--blue:#3b82f6;--purple:#8b5cf6;--orange:#f59e0b;
+--text:#edf2f7;--text2:#94a3b8;--text3:#64748b;
+--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);
+--font-d:'Unbounded',sans-serif;--font-b:'Manrope',sans-serif;--max:1240px}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:var(--bg)}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;width:100%;z-index:100;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;transition:all .3s;background:rgba(6,10,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--accent)}
+.nav-logo span{color:var(--text2);font-weight:400;font-size:11px;margin-left:6px}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-links a{font-size:12.5px;font-weight:500;color:var(--text2);transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-r{display:flex;gap:10px;align-items:center}
+.nav-login{font-size:12px;color:var(--text2);padding:6px 14px;border:1px solid var(--border2);border-radius:8px;transition:all .25s}
+.nav-login:hover{border-color:var(--accent);color:var(--accent)}
+.burger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:8px}
+.burger span{width:20px;height:2px;background:var(--text);transition:all .3s}
+.mob-menu{display:none;position:fixed;top:56px;left:0;width:100%;background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 20px;flex-direction:column;gap:12px;z-index:99}
+.mob-menu.show{display:flex}
+.mob-menu a{font-size:13px;color:var(--text2);padding:8px 0}
+@media(max-width:900px){.nav-links,.nav-r{display:none}.burger{display:flex}}
+
+/* FORM */
+.page{padding:100px 20px 60px}
+.w{max-width:680px;margin:0 auto}
+.page-title{font-family:var(--font-d);font-size:28px;font-weight:800;margin-bottom:8px;text-align:center}
+.page-sub{font-size:14px;color:var(--text2);text-align:center;margin-bottom:40px;line-height:1.7}
+
+.form-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px}
+.form-group{margin-bottom:20px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;font-size:14px;font-family:var(--font-b);color:var(--text);transition:border-color .2s;outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text3)}
+.form-select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.form-select option{background:var(--bg2);color:var(--text)}
+.form-textarea{min-height:100px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:520px){.form-row{grid-template-columns:1fr}}
+
+.form-dir{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px}
+.form-dir-btn{padding:10px 8px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;text-align:center;font-size:11px;font-weight:600;color:var(--text2);transition:all .25s;font-family:var(--font-b)}
+.form-dir-btn:hover,.form-dir-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,160,.04)}
+.form-dir-btn .dir-icon{font-size:20px;display:block;margin-bottom:4px}
+@media(max-width:520px){.form-dir{grid-template-columns:1fr 1fr}}
+
+.btn-submit{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;margin-top:8px}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,229,160,.3)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+.form-success{display:none;text-align:center;padding:40px 20px}
+.form-success.show{display:block}
+.form-success .check{font-size:48px;margin-bottom:16px}
+.form-success h3{font-family:var(--font-d);font-size:20px;margin-bottom:8px}
+.form-success p{color:var(--text2);font-size:14px}
+
+.form-alt{text-align:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+.form-alt p{font-size:12px;color:var(--text3);margin-bottom:10px}
+.form-alt-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.form-alt-link{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid var(--border2);font-size:12px;font-weight:600;color:var(--text2);transition:all .25s}
+.form-alt-link:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Footer */
+.ft{border-top:1px solid var(--border);padding:24px;text-align:center}
+.ft-copy{font-size:11px;color:var(--text3);line-height:1.8}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.form-card{animation:fadeUp .6s ease}
+
+/* Dynamic fields */
+.type-fields{display:none}
+.type-fields.show{display:block}
+
+/* ── ANKETA CHAT ── */
+.anketa-section{margin-top:24px;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;overflow:hidden}
+.anketa-header{padding:20px;text-align:center;border-bottom:1px solid var(--border)}
+.anketa-title{font-family:var(--font-d);font-size:16px;font-weight:700;margin-bottom:4px}
+.anketa-sub{font-size:12px;color:var(--text2);margin-bottom:12px}
+.anketa-progress{height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.anketa-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .5s}
+.anketa-progress-text{font-size:11px;color:var(--text3);margin-top:4px}
+.anketa-chat{max-height:360px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+.anketa-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.55;word-wrap:break-word;white-space:pre-wrap}
+.anketa-msg.bot{align-self:flex-start;background:var(--bg3);color:var(--text);border-bottom-left-radius:4px}
+.anketa-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);font-weight:500;border-bottom-right-radius:4px}
+.anketa-quick{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px}
+.anketa-quick-btn{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:var(--font-b)}
+.anketa-quick-btn:hover{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.anketa-typing{display:none;padding:8px 16px;gap:4px}
+.anketa-typing.show{display:flex}
+.anketa-typing span{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:dotB 1.4s infinite}
+.anketa-typing span:nth-child(2){animation-delay:.2s}
+.anketa-typing span:nth-child(3){animation-delay:.4s}
+.anketa-input-row{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.anketa-input{flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:10px 14px;border-radius:12px;font-size:13.5px;outline:none;font-family:var(--font-b)}
+.anketa-input::placeholder{color:var(--text3)}
+.anketa-input:focus{border-color:var(--accent)}
+.anketa-send{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:var(--bg);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.anketa-send:hover{transform:scale(1.05)}
+.anketa-send:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.anketa-attach-btn{cursor:pointer;font-size:20px;padding:8px;border-radius:8px;transition:all .2s}
+.anketa-attach-btn:hover{background:var(--bg3)}
+.anketa-file-preview{padding:0 16px 8px;display:flex;gap:6px;flex-wrap:wrap}
+.anketa-file-preview img{width:48px;height:48px;border-radius:8px;object-fit:cover;border:1px solid var(--border2)}
+.anketa-skip{display:block;width:100%;padding:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;text-align:center;transition:color .2s;font-family:var(--font-b)}
+.anketa-skip:hover{color:var(--text)}
+
+/* ── REGISTER SUGGESTION ── */
+.register-section{margin-top:16px}
+.register-card{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;text-align:center}
+.register-title{font-family:var(--font-d);font-size:15px;font-weight:700;margin-bottom:4px}
+.register-sub{font-size:12px;color:var(--text2);margin-bottom:16px}
+.register-card .form-input{margin-bottom:8px}
+/* ── AI CHAT v10 ── */
+.ai-fab{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent,#00e5a0),#00b894);border:none;cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 20px rgba(0,229,160,.4);transition:all .3s}
+.ai-fab:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(0,229,160,.5)}.ai-fab.open{transform:rotate(90deg) scale(1.1)}
+.ai-panel{position:fixed;bottom:96px;right:24px;width:380px;max-width:calc(100vw - 32px);height:520px;max-height:calc(100vh - 140px);background:var(--bg2,#0c1220);border:1px solid var(--border2,rgba(255,255,255,.1));border-radius:20px;z-index:10001;display:none;flex-direction:column;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,.5);animation:chatUp .3s}
+.ai-panel.show{display:flex}
+@keyframes chatUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ai-head{padding:16px 20px;background:linear-gradient(135deg,rgba(0,229,160,.1),rgba(0,184,148,.05));border-bottom:1px solid var(--border,rgba(255,255,255,.06));display:flex;align-items:center;gap:12px}
+.ai-head-info{flex:1}.ai-head-title{font-size:15px;font-weight:700;color:var(--text,#edf2f7)}.ai-head-sub{font-size:12px;color:var(--text2,#94a3b8);margin-top:2px}
+.ai-head-dot{width:8px;height:8px;border-radius:50%;background:#00e5a0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.ai-close{background:none;border:none;color:var(--text3,#64748b);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:8px}.ai-close:hover{background:rgba(255,255,255,.05);color:var(--text,#edf2f7)}
+.ai-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.ai-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.55;word-wrap:break-word;white-space:pre-wrap}
+.ai-msg.bot{align-self:flex-start;background:var(--bg3,#121a2c);color:var(--text,#edf2f7);border-bottom-left-radius:4px}
+.ai-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent,#00e5a0),#00b894);color:var(--bg,#060a14);font-weight:500;border-bottom-right-radius:4px}
+.ai-msg .ai-model{display:block;font-size:10px;color:var(--text3,#64748b);margin-top:6px;font-style:italic}
+.ai-typing{align-self:flex-start;padding:12px 16px;background:var(--bg3,#121a2c);border-radius:14px;border-bottom-left-radius:4px;display:none;gap:4px}
+.ai-typing.show{display:flex}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--text3,#64748b);animation:dotB 1.4s infinite}.ai-typing span:nth-child(2){animation-delay:.2s}.ai-typing span:nth-child(3){animation-delay:.4s}
+@keyframes dotB{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.ai-quick{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
+.ai-quick-btn{background:var(--bg3,#121a2c);border:1px solid var(--border2,rgba(255,255,255,.1));color:var(--text,#edf2f7);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}.ai-quick-btn:hover{background:var(--accent,#00e5a0);color:var(--bg,#060a14);border-color:var(--accent,#00e5a0)}
+.ai-foot{padding:12px 16px;border-top:1px solid var(--border,rgba(255,255,255,.06));display:flex;gap:8px;align-items:center}
+.ai-foot input{flex:1;background:var(--bg3,#121a2c);border:1px solid var(--border2,rgba(255,255,255,.1));color:var(--text,#edf2f7);padding:10px 14px;border-radius:12px;font-size:13.5px;outline:none;font-family:inherit}.ai-foot input::placeholder{color:var(--text3,#64748b)}.ai-foot input:focus{border-color:var(--accent,#00e5a0)}
+.ai-foot button{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent,#00e5a0),#00b894);border:none;color:var(--bg,#060a14);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}.ai-foot button:hover{transform:scale(1.05)}.ai-foot button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+@media(max-width:480px){.ai-panel{bottom:0;right:0;width:100%;height:100vh;max-height:100vh;border-radius:0}.ai-fab{bottom:16px;right:16px;width:52px;height:52px;font-size:24px}}
+
+/* Toast notifications */
+.order-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--bg3,#121a2c);color:var(--text,#edf2f7);padding:12px 24px;border-radius:12px;font-size:13px;font-weight:500;z-index:10000;transition:transform .3s ease;border:1px solid var(--border2);box-shadow:0 8px 32px rgba(0,0,0,.4);max-width:90vw;text-align:center}
+.order-toast.show{transform:translateX(-50%) translateY(0)}
+.order-toast.error{border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1)}
+.order-toast.success{border-color:rgba(0,229,160,.3);background:rgba(0,229,160,.1)}
+
+</style>
+</head><body>
+<div id="orderToast" class="order-toast"></div>
+
+<!-- NAV -->
+<nav class="nav">
+<a href="/" class="nav-logo">RCT<span>группа компаний</span></a>
+<div class="nav-links">
+<a href="/med/">Медоборудование</a>
+<a href="/sites/">Сайты</a>
+<a href="/content/">AI-контент</a>
+<a href="/ai/">ИИ-агенты</a>
+<a href="/about/">О компании</a>
+</div>
+<div class="nav-r"><a href="/login/" class="nav-login">Войти</a></div>
+<div class="burger" onclick="document.getElementById('mobMenu').classList.toggle('show')"><span></span><span></span><span></span></div>
+</nav>
+<div class="mob-menu" id="mobMenu">
+<a href="/med/">Медоборудование</a><a href="/sites/">Сайты</a><a href="/content/">AI-контент</a><a href="/ai/">ИИ-агенты</a><a href="/about/">О компании</a>
+<a href="/login/">Войти</a>
+</div>
+
+<!-- FORM -->
+<div class="page">
+<div class="w">
+<h1 class="page-title">Оформить заявку</h1>
+<p class="page-sub">Выберите направление, заполните форму — свяжемся в течение часа.</p>
+
+<div class="form-card" id="formCard">
+
+<!-- Direction selector -->
+<div class="form-label" style="margin-bottom:10px">Направление</div>
+<div class="form-dir">
+<button class="form-dir-btn active" data-dir="sites" onclick="selectDir(this)"><span class="dir-icon">🌐</span>Сайт</button>
+<button class="form-dir-btn" data-dir="content" onclick="selectDir(this)"><span class="dir-icon">🎬</span>AI-контент</button>
+<button class="form-dir-btn" data-dir="ai" onclick="selectDir(this)"><span class="dir-icon">🤖</span>ИИ-агент</button>
+<button class="form-dir-btn" data-dir="med" onclick="selectDir(this)"><span class="dir-icon">🏥</span>Медоборуд.</button>
+</div>
+
+<!-- Common fields -->
+<div class="form-row">
+<div class="form-group">
+<label class="form-label">Ваше имя</label>
+<input class="form-input" id="fName" placeholder="Как к вам обращаться">
+</div>
+<div class="form-group">
+<label class="form-label">Телефон</label>
+<input class="form-input" id="fPhone" type="tel" placeholder="+7 (___) ___-__-__">
+</div>
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label class="form-label">Telegram</label>
+<input class="form-input" id="fTelegram" placeholder="@username">
+</div>
+<div class="form-group">
+<label class="form-label">Компания / Проект</label>
+<input class="form-input" id="fCompany" placeholder="Название бизнеса">
+</div>
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label class="form-label">Город</label>
+<input class="form-input" id="fCity" placeholder="Казань" value="Казань">
+</div>
+<div class="form-group">
+<!-- пустая ячейка для выравнивания -->
+</div>
+</div>
+
+<!-- Sites-specific -->
+<div class="type-fields show" id="fieldsSites">
+<div class="form-row">
+<div class="form-group">
+<label class="form-label">Тип сайта</label>
+<select class="form-select" id="fSiteType" onchange="toggleSiteUpgrade()">
+<option value="Визитка">Визитка — 5 000 ₽</option>
+<option value="Лендинг" selected>Лендинг — 10 000 ₽</option>
+<option value="Каталог">Каталог — 15 000 ₽</option>
+<option value="Премиум">Премиум — 25 000 ₽</option>
+<option value="Улучшение">🔧 Улучшение существующего сайта — от 3 000 ₽</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label">Пример / Референс</label>
+<input class="form-input" id="fRef" placeholder="https://example.com">
+</div>
+</div>
+<div id="upgradeFields" style="display:none;margin-bottom:16px">
+<div class="form-group">
+<label class="form-label">🌐 Ссылка на ваш текущий сайт</label>
+<input class="form-input" id="fCurrentSite" placeholder="https://ваш-сайт.ru">
+</div>
+<div class="form-group">
+<label class="form-label">Что хотите улучшить?</label>
+<select class="form-select" id="fUpgradeType">
+<option value="Дизайн">🎨 Обновить дизайн</option>
+<option value="Адаптивность">📱 Сделать адаптивным (мобильная версия)</option>
+<option value="Скорость">⚡ Ускорить загрузку</option>
+<option value="SEO">🔍 SEO-оптимизация</option>
+<option value="Контент">📝 Обновить контент и тексты</option>
+<option value="Функционал">⚙️ Добавить функционал (формы, чат, CRM)</option>
+<option value="Полный редизайн">🔄 Полный редизайн</option>
+<option value="Другое">💬 Другое (опишу в комментарии)</option>
+</select>
+</div>
+</div>
+</div>
+
+<!-- Content-specific -->
+<div class="type-fields" id="fieldsContent">
+<div class="form-group">
+<label class="form-label">Тип контента</label>
+<select class="form-select" id="fContentType">
+<option value="Рекламное видео">Рекламное видео (Reels/Shorts)</option>
+<option value="Фото для бизнеса">Фото для бизнеса</option>
+<option value="Виртуальный инфлюенсер">Виртуальный инфлюенсер</option>
+<option value="Контент для соцсетей">Контент для соцсетей</option>
+<option value="Дизайн и графика">Дизайн и графика</option>
+<option value="Фото для маркетплейсов">Фото для маркетплейсов</option>
+</select>
+</div>
+</div>
+
+<!-- AI-specific -->
+<div class="type-fields" id="fieldsAi">
+<div class="form-group">
+<label class="form-label">Задача</label>
+<select class="form-select" id="fAiType">
+<option value="Telegram-бот">Telegram-бот с ИИ</option>
+<option value="CRM-автоматизация">CRM-автоматизация</option>
+<option value="Автоматизация процессов">Автоматизация процессов (n8n)</option>
+<option value="Интеграция сервисов">Интеграция сервисов</option>
+<option value="ИИ для сайта">ИИ-ассистент для сайта</option>
+<option value="Другое">Другое</option>
+</select>
+</div>
+</div>
+
+<!-- Med-specific -->
+<div class="type-fields" id="fieldsMed">
+<div class="form-group">
+<label class="form-label">Роль</label>
+<select class="form-select" id="fMedRole">
+<option value="Медучреждение">Медицинское учреждение (закупка)</option>
+<option value="Инвестор">Инвестор</option>
+<option value="Дистрибьютор">Дистрибьютор / партнёр</option>
+<option value="Производитель">Производитель оборудования</option>
+<option value="Другое">Другое</option>
+</select>
+</div>
+</div>
+
+<div class="form-group">
+<label class="form-label">Комментарий</label>
+<textarea class="form-textarea" id="fMessage" placeholder="Расскажите подробнее о задаче или проекте"></textarea>
+</div>
+
+<label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#aaa;cursor:pointer;margin-top:8px">
+  <input type="checkbox" id="orderConsent" style="margin-top:2px;accent-color:#00d4aa;flex-shrink:0">
+  <span>Я соглашаюсь с <a href="https://rct-hub.ru/hub/#privacy" onclick="if(typeof showLegalPage==='function'){showLegalPage('privacy');return false;}" style="color:#00d4aa">Политикой конфиденциальности</a> и даю согласие на обработку персональных данных</span>
+</label>
+<button class="btn-submit" id="btnSubmit" onclick="submitForm()">Отправить заявку</button>
+</div>
+
+<!-- Success + Anketa Chat -->
+<div class="form-success" id="formSuccess">
+<div class="check">✅</div>
+<h3>Заявка отправлена!</h3>
+<p>Свяжемся с вами в течение часа.</p>
+
+<!-- Anketa AI Chat -->
+<div class="anketa-section" id="anketaSection" style="display:none">
+<div class="anketa-header">
+  <div class="anketa-title">🤖 Расскажите подробнее о проекте</div>
+  <div class="anketa-sub">Наш ИИ-помощник задаст несколько вопросов, чтобы мы подготовили точное предложение</div>
+  <div class="anketa-progress">
+    <div class="anketa-progress-bar" id="anketaProgressBar" style="width:0%"></div>
+  </div>
+  <div class="anketa-progress-text" id="anketaProgressText">Заполнено: 0%</div>
+</div>
+<div class="anketa-chat" id="anketaBody"></div>
+<div class="anketa-quick" id="anketaQuick"></div>
+<div class="anketa-typing" id="anketaTyping"><span></span><span></span><span></span></div>
+<div class="anketa-input-row">
+  <label class="anketa-attach-btn" title="Прикрепить фото">
+    📎
+    <input type="file" id="anketaFiles" multiple accept="image/*" style="display:none" onchange="handleAnketaFiles(event)">
+  </label>
+  <input class="anketa-input" id="anketaInput" placeholder="Расскажите о вашем бизнесе..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAnketaMessage()}">
+  <button class="anketa-send" id="anketaSendBtn" onclick="sendAnketaMessage()">➤</button>
+</div>
+<div class="anketa-file-preview" id="anketaFilePreview"></div>
+<button class="anketa-skip" onclick="skipAnketa()">Пропустить → свяжитесь со мной напрямую</button>
+</div>
+
+<!-- Register suggestion -->
+<div class="register-section" id="registerSection" style="display:none">
+<div class="register-card">
+  <div class="register-title">💡 Хотите отслеживать статус проекта?</div>
+  <div class="register-sub">Зарегистрируйтесь в личном кабинете — это 15 секунд</div>
+  <input class="form-input" id="regName" placeholder="Имя" disabled>
+  <input class="form-input" id="regPhone" placeholder="Телефон" disabled>
+  <input class="form-input" id="regTelegram" placeholder="Telegram" disabled>
+  <input class="form-input" id="regPassword" type="password" placeholder="Придумайте пароль">
+  <button class="btn-submit" onclick="quickRegister()" style="margin-top:8px">Зарегистрироваться</button>
+  <button class="anketa-skip" onclick="skipRegister()">Пропустить</button>
+</div>
+</div>
+
+<div class="form-alt-links" style="margin-top:16px" id="directLinks">
+<a href="https://t.me/AIhroject_bot" target="_blank" class="form-alt-link">🤖 @AIhroject_bot</a>
+<a href="mailto:info@rct-hub.ru" class="form-alt-link">📧 info@rct-hub.ru</a>
+<a href="tel:+79872255225" class="form-alt-link">📞 +7 987 225-52-25</a>
+</div>
+</div>
+
+<div class="form-alt">
+<p>Или свяжитесь напрямую</p>
+<div class="form-alt-links">
+<a href="https://t.me/AIhroject_bot" target="_blank" class="form-alt-link">🤖 Telegram-бот</a>
+<a href="tel:+79872255225" class="form-alt-link">📞 +7 987 225-52-25</a>
+<a href="mailto:info@rct-hub.ru" class="form-alt-link">📧 Email</a>
+</div>
+</div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer class="ft">
+<div class="ft-copy">© 2025–2026 RCT — Российские Компьютерные Технологии · Казань · ОЭЗ «Иннополис» · <a href="mailto:info@rct-hub.ru" style="color:var(--accent)">info@rct-hub.ru</a></div>
+</footer>
+
+<script>
+function toast(msg, type) {
+  var el = document.getElementById('orderToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'order-toast ' + (type || 'success') + ' show';
+  setTimeout(function() { el.classList.remove('show'); }, 3500);
+}
+
+const SUPABASE_URL = 'https://prparzgqevfelwsndmkc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_gFeXATQGYxKx08BpeOedZg_7buTwVJq';
+const SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentDir = 'sites';
+let lastDirectionId = null; // ID созданного направления для анкеты
+
+// Маппинг типа сайта → цена
+const PRICE_MAP = { 'Визитка': 5000, 'Лендинг': 10000, 'Каталог': 15000, 'Премиум': 25000, 'Улучшение': 3000 };
+
+function toggleSiteUpgrade() {
+  var st = document.getElementById('fSiteType').value;
+  var uf = document.getElementById('upgradeFields');
+  var rf = document.getElementById('fRef');
+  if (st === 'Улучшение') {
+    uf.style.display = 'block';
+    rf.placeholder = 'Пример нового дизайна (опционально)';
+  } else {
+    uf.style.display = 'none';
+    rf.placeholder = 'https://example.com';
+  }
+}
+
+function selectDir(btn) {
+  document.querySelectorAll('.form-dir-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentDir = btn.dataset.dir;
+  document.querySelectorAll('.type-fields').forEach(f => f.classList.remove('show'));
+  const map = {sites:'fieldsSites', content:'fieldsContent', ai:'fieldsAi', med:'fieldsMed'};
+  document.getElementById(map[currentDir]).classList.add('show');
+}
+
+// Получить тип услуги в зависимости от направления
+function getServiceType() {
+  if (currentDir === 'sites') return document.getElementById('fSiteType').value;
+  if (currentDir === 'content') return document.getElementById('fContentType').value;
+  if (currentDir === 'ai') return document.getElementById('fAiType').value;
+  if (currentDir === 'med') return document.getElementById('fMedRole').value;
+  return '';
+}
+
+// Получить цену
+function getServicePrice() {
+  if (currentDir === 'sites') return PRICE_MAP[document.getElementById('fSiteType').value] || 0;
+  return 0;
+}
+
+async function submitForm() {
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Отправка...';
+
+  const name = document.getElementById('fName').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const telegram = document.getElementById('fTelegram').value.trim();
+  const company = document.getElementById('fCompany').value.trim();
+  const city = document.getElementById('fCity').value.trim();
+  const message = document.getElementById('fMessage').value.trim();
+
+  if (!document.getElementById('orderConsent')?.checked) {
+    toast('Необходимо согласие на обработку персональных данных','error');
+    btn.disabled = false;
+    btn.textContent = 'Отправить заявку';
+    return;
+  }
+  if (!name || (!phone && !telegram)) {
+    toast('Укажите имя и телефон или Telegram','error');
+    btn.disabled = false;
+    btn.textContent = 'Отправить заявку';
+    return;
+  }
+
+  // Build direction-specific info
+  let details = '';
+  const serviceType = getServiceType();
+  const servicePrice = getServicePrice();
+
+  if (currentDir === 'sites') {
+    details = 'Тип: ' + serviceType + ' (' + servicePrice.toLocaleString('ru') + '₽)';
+    if (serviceType === 'Улучшение') {
+      var curSite = (document.getElementById('fCurrentSite')?.value || '').trim();
+      var upgradeType = (document.getElementById('fUpgradeType')?.value || '');
+      if (curSite) details += ', Текущий сайт: ' + curSite;
+      if (upgradeType) details += ', Улучшение: ' + upgradeType;
+    }
+    if (document.getElementById('fRef').value) details += ', Реф: ' + document.getElementById('fRef').value;
+  }
+  if (currentDir === 'content') details = 'Тип: ' + serviceType;
+  if (currentDir === 'ai') details = 'Задача: ' + serviceType;
+  if (currentDir === 'med') details = 'Роль: ' + serviceType;
+
+  const dirMap = {sites:'Сайты', content:'AI-контент', ai:'ИИ-агенты', med:'Медоборудование'};
+  const dirId = 'DIR' + Date.now().toString(36).toUpperCase();
+
+  // Save to Supabase client_requests table (using supabase-js)
+  try {
+    const comment = [details, message].filter(Boolean).join(' | ');
+    const payload = {
+      name: name,
+      phone: phone,
+      telegram: telegram || null,
+      company: company,
+      city: city,
+      direction: dirMap[currentDir],
+      details: details,
+      message: message,
+      comment: comment,
+      status: 'new',
+      source: 'website_order',
+      created_at: new Date().toISOString()
+    };
+
+    const { error } = await SB.from('client_requests').insert(payload);
+
+    if (error) {
+      console.error('Supabase INSERT error:', error);
+      toast('Ошибка сохранения заявки: ' + error.message + '. Попробуйте позже.','error');
+      btn.disabled = false;
+      btn.textContent = 'Отправить заявку';
+      return;
+    }
+
+    // CRM direction — с ценой, типом и telegram
+    lastDirectionId = dirId;
+    SB.from('directions').insert({
+      id: dirId,
+      name: name,
+      project: {sites:'Сайты', content:'AI-контент', ai:'ИИ-агенты', med:'РКТ'}[currentDir] || 'Сайты',
+      status: 'Новый',
+      stage: 'prospect',
+      phone: phone,
+      telegram_tag: telegram || null,
+      city: city || '',
+      description: comment || 'Заявка',
+      source: 'Форма заказа',
+      site_type: serviceType === 'Улучшение' ? 'Улучшение: ' + (document.getElementById('fUpgradeType')?.value || '') : serviceType,
+      price: servicePrice,
+      business_type: company || '',
+      site_url: serviceType === 'Улучшение' ? (document.getElementById('fCurrentSite')?.value || '').trim() || null : null
+    }).then(function() {
+      console.log('Direction created:', dirId);
+    }).catch(function(e) { console.warn('CRM direction error:', e); });
+
+    // Notify via n8n webhook (fire-and-forget)
+    var currentSiteUrl = serviceType === 'Улучшение' ? (document.getElementById('fCurrentSite')?.value || '').trim() : '';
+    var tgText = '📋 Новая заявка с сайта!\n\n' +
+      '👤 ' + name + '\n📞 ' + (phone || '—') +
+      (telegram ? '\n💬 TG: ' + telegram : '') +
+      '\n🏢 ' + (company || '—') + '\n📍 ' + (city || '—') +
+      '\n📂 ' + dirMap[currentDir] + '\n' + details +
+      (currentSiteUrl ? '\n🌐 Текущий сайт: ' + currentSiteUrl : '') +
+      (servicePrice ? '\n💰 ' + servicePrice.toLocaleString('ru') + '₽' : '') +
+      (message ? '\n💬 ' + message : '');
+
+    fetch('https://daniyal2212.app.n8n.cloud/webhook/rkt-ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'telegram_notify',
+        chat_id: '798494835',
+        message: tgText,
+        userId: 'website'
+      })
+    }).catch(function(e) { console.warn('n8n notify error:', e); });
+
+    // Fallback: Direct Telegram notification (если n8n не отправит)
+    sendTelegramDirect(tgText);
+
+  } catch(e) {
+    console.error('submitForm error:', e);
+    toast('Ошибка отправки: ' + e.message + '. Попробуйте позже.','error');
+    btn.disabled = false;
+    btn.textContent = 'Отправить заявку';
+    return;
+  }
+
+  // Show success + anketa chat
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('formSuccess').classList.add('show');
+  startAnketaChat(dirId, name, getServiceType(), dirMap[currentDir]);
+}
+
+// ═══ DIRECT TELEGRAM NOTIFICATION (fallback) ═══
+async function sendTelegramDirect(text) {
+  try {
+    // Загружаем bot token из Supabase settings
+    var res = await fetch(SUPABASE_URL + '/rest/v1/settings?select=key,value&key=in.(telegram_bot_token,telegram_ceo_chat_id)', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    var rows = await res.json();
+    if (!Array.isArray(rows)) return;
+    var cfg = {};
+    rows.forEach(function(r) { cfg[r.key] = r.value; });
+    var token = cfg.telegram_bot_token;
+    var chatId = cfg.telegram_ceo_chat_id || '798494835';
+    if (!token) return;
+
+    fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'HTML' })
+    }).catch(function(e) { console.warn('TG direct err:', e); });
+  } catch(e) { console.warn('TG direct load err:', e); }
+}
+
+// ═══════════════════════════════════════════
+// ANKETA AI CHAT — сбор информации после заявки
+// ═══════════════════════════════════════════
+
+let anketaDirId = null;
+let anketaMessages = [];
+let anketaSending = false;
+let anketaFiles = [];
+let anketaCompleteness = 0;
+
+// Триггеры "хочу человека"
+const HUMAN_TRIGGERS = /менеджер|человек|оператор|свяж|позвон|перезвон|живой|реальн|поговорить|позвать|написать.*менеджер/i;
+
+function startAnketaChat(dirId, clientName, serviceType, direction) {
+  anketaDirId = dirId;
+  var section = document.getElementById('anketaSection');
+  if (!section) return;
+  section.style.display = 'block';
+
+  // Приветственное сообщение зависит от типа
+  var greetings = {
+    'Сайты': 'Спасибо за заявку, ' + clientName + '! 🎉\n\nЧтобы мы подготовили точное предложение по сайту (' + serviceType + '), расскажите подробнее:\n\n• Какой у вас бизнес? (ресторан, магазин, услуги, клиника...)\n• Есть ли уже логотип и фирменный стиль?\n• Какие разделы нужны на сайте?',
+    'AI-контент': 'Спасибо за заявку, ' + clientName + '! 🎉\n\nЧтобы подготовить предложение по AI-контенту (' + serviceType + '), расскажите:\n\n• Для какого бизнеса нужен контент?\n• Какие площадки используете? (Instagram, YouTube, TikTok...)\n• Есть ли примеры контента, который вам нравится?',
+    'ИИ-агенты': 'Спасибо за заявку, ' + clientName + '! 🎉\n\nРасскажите подробнее о задаче (' + serviceType + '):\n\n• Какие процессы нужно автоматизировать?\n• Какие системы/сервисы используете сейчас?\n• Сколько сотрудников будут работать с ботом?',
+    'Медоборудование': 'Спасибо за заявку, ' + clientName + '! 🎉\n\nРасскажите подробнее:\n\n• Какое оборудование вас интересует?\n• Объём закупки?\n• Для какого учреждения?'
+  };
+
+  var greeting = greetings[direction] || 'Спасибо за заявку, ' + clientName + '! 🎉\n\nРасскажите подробнее о вашем проекте.';
+  addAnketaMsg(greeting, 'bot');
+
+  // Сохраняем greeting в anketa_chat
+  saveAnketaChatMsg(dirId, 'assistant', greeting);
+
+  // Quick buttons зависят от типа
+  var quickBtns = {
+    'Сайты': [
+      {label: '🍽 Ресторан', text: 'У меня ресторан/кафе'},
+      {label: '🛍 Магазин', text: 'У меня интернет-магазин'},
+      {label: '💇 Услуги', text: 'Я оказываю услуги (салон, клиника и т.д.)'},
+      {label: '🏢 Компания', text: 'Корпоративный сайт компании'}
+    ],
+    'AI-контент': [
+      {label: '📱 Reels', text: 'Нужны Reels/Shorts для соцсетей'},
+      {label: '📸 Фото', text: 'Нужны фото для бизнеса'},
+      {label: '🎨 Дизайн', text: 'Нужен дизайн и графика'},
+      {label: '👤 Инфлюенсер', text: 'Хочу виртуального инфлюенсера'}
+    ],
+    'ИИ-агенты': [
+      {label: '🤖 Telegram-бот', text: 'Нужен Telegram-бот с ИИ'},
+      {label: '📊 CRM', text: 'Нужна CRM-автоматизация'},
+      {label: '⚙️ n8n', text: 'Автоматизация процессов через n8n'},
+      {label: '🔗 Интеграция', text: 'Интеграция сервисов между собой'}
+    ]
+  };
+
+  var btns = quickBtns[direction] || [];
+  var quickEl = document.getElementById('anketaQuick');
+  quickEl.innerHTML = btns.map(function(b) {
+    return '<button class="anketa-quick-btn" onclick="sendAnketaQuick(\'' + b.text.replace(/'/g, "\\'") + '\')">' + b.label + '</button>';
+  }).join('');
+
+  // Scroll to anketa
+  setTimeout(function() { section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
+}
+
+function addAnketaMsg(text, who) {
+  var body = document.getElementById('anketaBody');
+  var div = document.createElement('div');
+  div.className = 'anketa-msg ' + who;
+  if (who === 'bot') {
+    div.innerHTML = text.replace(/\n/g, '<br>');
+  } else {
+    div.textContent = text;
+  }
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function sendAnketaQuick(text) {
+  document.getElementById('anketaQuick').style.display = 'none';
+  addAnketaMsg(text, 'user');
+  processAnketaMessage(text);
+}
+
+function sendAnketaMessage() {
+  var inp = document.getElementById('anketaInput');
+  var text = inp.value.trim();
+  if (!text || anketaSending) return;
+  inp.value = '';
+  addAnketaMsg(text, 'user');
+  processAnketaMessage(text);
+}
+
+async function processAnketaMessage(text) {
+  if (anketaSending) return;
+  anketaSending = true;
+
+  // Проверяем "хочу человека"
+  if (HUMAN_TRIGGERS.test(text)) {
+    requestHumanContact(text);
+  }
+
+  // Сохраняем сообщение пользователя
+  saveAnketaChatMsg(anketaDirId, 'user', text);
+  anketaMessages.push({ role: 'user', content: text });
+
+  // Показать typing
+  var typing = document.getElementById('anketaTyping');
+  typing.classList.add('show');
+  document.getElementById('anketaSendBtn').disabled = true;
+
+  try {
+    // Используем AI-каскад (те же ключи что у AI Chat v10)
+    var systemPrompt = buildAnketaSystemPrompt();
+    var msgs = anketaMessages.slice(-12);
+    var cascade = aiGetCascade();
+
+    var reply = '';
+    var extractedData = null;
+
+    for (var i = 0; i < cascade.length; i++) {
+      try {
+        var result = await aiCallProvider(cascade[i], text, systemPrompt, msgs, 20000);
+        reply = result.text;
+
+        // Парсим JSON блок с extracted data
+        var jsonMatch = reply.match(/```json\s*([\s\S]*?)```/);
+        if (jsonMatch) {
+          try {
+            extractedData = JSON.parse(jsonMatch[1]);
+            reply = reply.replace(/```json[\s\S]*?```/, '').trim();
+          } catch(e) {}
+        }
+
+        // Парсим inline JSON {extracted:..., completeness:...}
+        if (!extractedData) {
+          var inlineMatch = reply.match(/\{[\s\S]*"extracted"[\s\S]*\}/);
+          if (inlineMatch) {
+            try {
+              extractedData = JSON.parse(inlineMatch[0]);
+              reply = reply.replace(inlineMatch[0], '').trim();
+            } catch(e) {}
+          }
+        }
+
+        break; // Успех
+      } catch(e) {
+        continue; // Следующая модель
+      }
+    }
+
+    if (!reply) {
+      reply = 'Извините, не удалось обработать ответ. Попробуйте ещё раз или напишите нам напрямую: @AIhroject_bot';
+    }
+
+    typing.classList.remove('show');
+    addAnketaMsg(reply, 'bot');
+    anketaMessages.push({ role: 'assistant', content: reply });
+
+    // Сохраняем ответ
+    saveAnketaChatMsg(anketaDirId, 'assistant', reply, extractedData);
+
+    // Обновляем completeness
+    if (extractedData && extractedData.completeness !== undefined) {
+      anketaCompleteness = Math.round(extractedData.completeness * 100);
+      document.getElementById('anketaProgressBar').style.width = anketaCompleteness + '%';
+      document.getElementById('anketaProgressText').textContent = 'Заполнено: ' + anketaCompleteness + '%';
+
+      // Обновляем direction в БД
+      updateDirectionQuestionnaire(anketaDirId, extractedData);
+    }
+
+    // Если completeness >= 70%, предложить регистрацию
+    if (anketaCompleteness >= 70) {
+      setTimeout(function() { showRegisterSuggestion(); }, 2000);
+    }
+
+  } catch(e) {
+    typing.classList.remove('show');
+    addAnketaMsg('Ошибка: ' + e.message + '\nПопробуйте ещё раз.', 'bot');
+  }
+
+  anketaSending = false;
+  document.getElementById('anketaSendBtn').disabled = false;
+  document.getElementById('anketaInput').focus();
+}
+
+function buildAnketaSystemPrompt() {
+  var dirNames = {sites:'сайт', content:'AI-контент', ai:'ИИ-агент', med:'медоборудование'};
+  return 'Ты ИИ-помощник RCT. Клиент только что оставил заявку на ' + (dirNames[currentDir] || 'услугу') + '.\n' +
+    'Твоя задача — собрать подробную информацию для подготовки точного предложения.\n\n' +
+    'ПРАВИЛА:\n' +
+    '1. Задавай по 1-2 вопроса за раз, не перегружай\n' +
+    '2. Будь дружелюбным и профессиональным\n' +
+    '3. Отвечай на русском, коротко\n' +
+    '4. Если клиент просит связь с человеком — ответь что передал заявку менеджеру\n\n' +
+    'ЧТО НУЖНО УЗНАТЬ (для ' + (dirNames[currentDir] || 'услуги') + '):\n' +
+    (currentDir === 'sites' ?
+      '- Тип бизнеса (ресторан, магазин, услуги, клиника и т.д.)\n- Название компании/бренда\n- Есть ли логотип и фирменный стиль\n- Какие разделы нужны на сайте\n- Есть ли контент (тексты, фото)\n- Есть ли примеры/референсы сайтов которые нравятся\n- Целевая аудитория\n- Сроки\n' :
+    currentDir === 'content' ?
+      '- Для какого бизнеса\n- Площадки (Instagram, YouTube, TikTok)\n- Формат контента\n- Стиль и тон\n- Частота публикаций\n- Бюджет\n' :
+    currentDir === 'ai' ?
+      '- Какие процессы автоматизировать\n- Текущие системы/сервисы\n- Количество пользователей\n- Бюджет и сроки\n' :
+      '- Какое оборудование\n- Объём\n- Учреждение\n- Бюджет\n') +
+    '\nВ конце каждого ответа добавь JSON блок (невидимый для пользователя):\n' +
+    '```json\n{"extracted":{"business_type":"...","company":"...","services":"...","style":"...", ...только то что узнал},"completeness":0.3}\n```\n' +
+    'completeness — от 0.0 до 1.0, насколько собрана информация.';
+}
+
+// Сохранение сообщения в anketa_chat
+function saveAnketaChatMsg(dirId, role, content, extractedData) {
+  var h = { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY, 'Prefer':'return=minimal' };
+  var body = {
+    direction_id: dirId,
+    role: role,
+    content: content
+  };
+  if (extractedData) body.extracted_data = extractedData;
+
+  fetch(SUPABASE_URL + '/rest/v1/anketa_chat', {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify(body)
+  }).catch(function(e) { console.warn('anketa_chat save err:', e); });
+}
+
+// Обновление questionnaire и completeness в directions
+function updateDirectionQuestionnaire(dirId, data) {
+  var h = { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY, 'Prefer':'return=minimal' };
+  var patch = {};
+  if (data.completeness !== undefined) patch.anketa_completeness = data.completeness;
+  if (data.extracted) {
+    patch.questionnaire = JSON.stringify({
+      _version: 2,
+      _last_updated: new Date().toISOString(),
+      business_info: data.extracted
+    });
+    // Также обновить конкретные поля если извлечены
+    if (data.extracted.business_type) patch.business_type = data.extracted.business_type;
+    if (data.extracted.style) patch.style = data.extracted.style;
+  }
+
+  fetch(SUPABASE_URL + '/rest/v1/directions?id=eq.' + dirId, {
+    method: 'PATCH',
+    headers: h,
+    body: JSON.stringify(patch)
+  }).catch(function(e) { console.warn('direction patch err:', e); });
+}
+
+// Запрос связи с человеком
+function requestHumanContact(userText) {
+  var name = document.getElementById('fName').value.trim();
+  var phone = document.getElementById('fPhone').value.trim();
+  var telegram = document.getElementById('fTelegram').value.trim();
+  var dirMap = {sites:'Сайты', content:'AI-контент', ai:'ИИ-агенты', med:'Медоборудование'};
+
+  // Сохраняем как urgent заявку
+  var h = { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY, 'Prefer':'return=minimal' };
+  fetch(SUPABASE_URL + '/rest/v1/client_requests', {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify({
+      name: name,
+      phone: phone,
+      telegram: telegram || null,
+      direction: dirMap[currentDir] || '',
+      comment: 'ЗАПРОС СВЯЗИ С ЧЕЛОВЕКОМ: ' + userText,
+      status: 'new',
+      source: 'human_request'
+    })
+  }).catch(function(e) {});
+
+  // Уведомление менеджеру через TG
+  var tgText = '🆘 Клиент просит связь с человеком!\n\n👤 ' + name +
+    '\n📞 ' + (phone || '—') + (telegram ? '\n💬 TG: ' + telegram : '') +
+    '\n📂 ' + (dirMap[currentDir] || '—') +
+    '\n💬 ' + userText;
+
+  fetch('https://daniyal2212.app.n8n.cloud/webhook/rkt-ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'telegram_notify',
+      chat_id: '798494835',
+      message: tgText,
+      userId: 'website'
+    })
+  }).catch(function(e) {});
+
+  sendTelegramDirect(tgText);
+}
+
+// Обработка файлов в анкете
+function handleAnketaFiles(event) {
+  var files = event.target.files;
+  var preview = document.getElementById('anketaFilePreview');
+  anketaFiles = Array.from(files);
+
+  preview.innerHTML = '';
+  anketaFiles.forEach(function(f) {
+    if (f.type.startsWith('image/')) {
+      var img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      preview.appendChild(img);
+    }
+  });
+}
+
+// Пропуск анкеты
+function skipAnketa() {
+  document.getElementById('anketaSection').style.display = 'none';
+  showRegisterSuggestion();
+}
+
+// Показать предложение регистрации
+function showRegisterSuggestion() {
+  var section = document.getElementById('registerSection');
+  if (!section || section.style.display === 'block') return;
+  section.style.display = 'block';
+
+  // Предзаполнить данные
+  var nameEl = document.getElementById('regName');
+  var phoneEl = document.getElementById('regPhone');
+  var tgEl = document.getElementById('regTelegram');
+
+  if (nameEl) nameEl.value = document.getElementById('fName').value.trim();
+  if (phoneEl) phoneEl.value = document.getElementById('fPhone').value.trim();
+  if (tgEl) tgEl.value = document.getElementById('fTelegram').value.trim();
+
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Быстрая регистрация
+async function quickRegister() {
+  var password = document.getElementById('regPassword').value.trim();
+  if (!password || password.length < 4) {
+    toast('Введите пароль (минимум 4 символа)','error');
+    return;
+  }
+
+  var name = document.getElementById('regName').value.trim();
+  var phone = document.getElementById('regPhone').value.trim();
+  var telegram = document.getElementById('regTelegram').value.trim();
+
+  try {
+    var h = { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY, 'Prefer':'return=minimal' };
+    var { error } = await SB.from('client_credentials').insert({
+      phone: phone,
+      name: name,
+      password_hash: password, // В идеале хешировать на сервере
+      telegram: telegram || null,
+      direction_id: lastDirectionId,
+      created_at: new Date().toISOString()
+    });
+
+    if (error) {
+      // Может уже существует
+      if (error.message && error.message.includes('duplicate')) {
+        toast('Аккаунт с этим номером уже существует. Войдите в личный кабинет.','error');
+      } else {
+        toast('Ошибка регистрации: ' + error.message,'error');
+      }
+      return;
+    }
+
+    document.getElementById('registerSection').innerHTML = '<div class="register-card"><div class="check" style="font-size:32px">🎉</div><div class="register-title">Вы зарегистрированы!</div><div class="register-sub">Войдите в <a href="/client/" style="color:var(--accent)">личный кабинет</a> чтобы отслеживать статус проекта</div></div>';
+  } catch(e) {
+    toast('Ошибка: ' + e.message,'error');
+  }
+}
+
+function skipRegister() {
+  document.getElementById('registerSection').style.display = 'none';
+}
+
+// ═══ FEEDBACK FORM — обратная связь от посетителей ═══
+function openFeedbackForm() {
+  // Скрываем AI чат, показываем форму фидбека
+  var existing = document.getElementById('feedbackOverlay');
+  if (existing) { existing.style.display = 'flex'; return; }
+
+  var overlay = document.createElement('div');
+  overlay.id = 'feedbackOverlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:20000;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.style.display = 'none'; };
+
+  overlay.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px;max-width:420px;width:100%">' +
+    '<h3 style="font-family:var(--font-d);font-size:16px;margin-bottom:4px">💬 Обратная связь</h3>' +
+    '<p style="font-size:12px;color:var(--text2);margin-bottom:16px">Предложения, замечания, отзывы — всё важно для нас</p>' +
+    '<input class="form-input" id="fbName" placeholder="Ваше имя" style="margin-bottom:8px">' +
+    '<input class="form-input" id="fbContact" placeholder="Email или Telegram (@username)" style="margin-bottom:8px">' +
+    '<textarea class="form-textarea" id="fbMessage" placeholder="Ваше сообщение..." style="min-height:80px;margin-bottom:12px"></textarea>' +
+    '<button class="btn-submit" onclick="submitFeedback()" style="margin:0">Отправить</button>' +
+    '<button style="display:block;width:100%;padding:8px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;margin-top:8px" onclick="document.getElementById(\'feedbackOverlay\').style.display=\'none\'">Закрыть</button>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+}
+
+async function submitFeedback() {
+  var name = document.getElementById('fbName').value.trim();
+  var contact = document.getElementById('fbContact').value.trim();
+  var message = document.getElementById('fbMessage').value.trim();
+
+  if (!message) { toast('Напишите сообщение','error'); return; }
+
+  try {
+    var h = { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY, 'Prefer':'return=minimal' };
+    await fetch(SUPABASE_URL + '/rest/v1/client_requests', {
+      method: 'POST',
+      headers: h,
+      body: JSON.stringify({
+        name: name || 'Посетитель',
+        phone: contact || '',
+        comment: message,
+        source: 'feedback',
+        status: 'new',
+        direction: 'Обратная связь'
+      })
+    });
+
+    // Telegram уведомление
+    var tgText = '💬 Обратная связь с сайта!\n\n' +
+      '👤 ' + (name || 'Аноним') + '\n' +
+      '📱 ' + (contact || '—') + '\n' +
+      '💬 ' + message;
+    sendTelegramDirect(tgText);
+
+    document.getElementById('feedbackOverlay').innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:40px;max-width:420px;width:100%;text-align:center">' +
+      '<div style="font-size:40px;margin-bottom:12px">🎉</div>' +
+      '<h3 style="font-family:var(--font-d);font-size:16px;margin-bottom:8px">Спасибо за отзыв!</h3>' +
+      '<p style="font-size:13px;color:var(--text2)">Мы обязательно его рассмотрим</p>' +
+      '<button style="margin-top:16px;padding:10px 24px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;cursor:pointer;font-family:var(--font-b)" onclick="document.getElementById(\'feedbackOverlay\').style.display=\'none\'">Закрыть</button>' +
+      '</div>';
+  } catch(e) {
+    toast('Ошибка отправки: ' + e.message,'error');
+  }
+}
+</script>
+
+<!-- AI CHAT v10 Multi-LLM -->
+<button class="ai-fab" id="aiFab" onclick="aiToggle()" aria-label="ИИ-ассистент">🤖</button>
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-head"><div class="ai-head-dot"></div><div class="ai-head-info"><div class="ai-head-title">🤖 ИИ-ассистент RCT</div><div class="ai-head-sub">Multi-AI · Groq + Gemini + Claude + DeepSeek</div></div><button class="ai-close" onclick="aiToggle()">✕</button></div>
+  <div class="ai-body" id="aiBody"><div class="ai-msg bot">Здравствуйте! 👋 Я ИИ-ассистент RCT.<br><br>Расскажу об услугах, ценах, сроках — спрашивайте!</div></div>
+  <div class="ai-quick" id="aiQuick">
+    <button class="ai-quick-btn" onclick="aiSendQuick('Сколько стоит сайт?')">💰 Цены</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Расскажите о медоборудовании')">🏥 Мед</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Что такое AI-контент?')">🎬 Контент</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Хочу заказать')">📝 Заказать</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Хочу связаться с менеджером')">👤 Менеджер</button>
+    <button class="ai-quick-btn" onclick="openFeedbackForm()">💬 Отзыв</button>
+  </div>
+  <div class="ai-typing" id="aiTyping"><span></span><span></span><span></span></div>
+  <div class="ai-foot"><input id="aiInput" placeholder="Задайте вопрос..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"><button id="aiSendBtn" onclick="aiSend()">➤</button></div>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// RCT AI CHAT v10 — Multi-LLM Cascade: Groq → Gemini → Claude → DeepSeek
+// Все ключи и промпт из Supabase. Единая база знаний.
+// ═══════════════════════════════════════════════════════════════
+const AI_SB = {
+  url: 'https://prparzgqevfelwsndmkc.supabase.co',
+  key: 'sb_publishable_gFeXATQGYxKx08BpeOedZg_7buTwVJq'
+};
+
+let aiCfg = {};
+let aiOpen = false;
+let aiMessages = [];
+let aiSession = 'web_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+let aiLeadSaved = false;
+let aiReady = false;
+
+const DIR_MAP = {'Сайты':'Сайты','AI-контент':'AI-контент','ИИ-агенты':'ИИ-агенты','Медоборудование':'РКТ'};
+
+// ═══ ЗАГРУЗКА КОНФИГА ═══
+async function aiLoadConfig() {
+  try {
+    var res = await fetch(AI_SB.url + '/rest/v1/settings?select=key,value', {
+      headers: { 'apikey': AI_SB.key, 'Authorization': 'Bearer ' + AI_SB.key }
+    });
+    var rows = await res.json();
+    if (!Array.isArray(rows)) return;
+    rows.forEach(function(r) { aiCfg[r.key] = r.value || ''; });
+    
+    // Проверяем есть ли хотя бы один ключ
+    var cascade = aiGetCascade();
+    aiReady = cascade.length > 0;
+
+    if (aiCfg.ai_chat_greeting) {
+      var first = document.querySelector('#aiBody .ai-msg.bot');
+      if (first) first.innerHTML = aiCfg.ai_chat_greeting.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+    }
+  } catch(e) { aiReady = false; }
+}
+
+function aiGetCascade() {
+  var order;
+  try { order = JSON.parse(aiCfg.ai_cascade || '["groq","gemini","claude","deepseek"]'); } catch(e) { order = ['groq','gemini','claude','deepseek']; }
+  // Фильтруем — только те, у кого есть ключ
+  return order.filter(function(p) {
+    if (p === 'groq') return !!aiCfg.groq_api_key;
+    if (p === 'gemini') return !!aiCfg.gemini_api_key;
+    if (p === 'claude') return !!aiCfg.claude_api_key;
+    if (p === 'deepseek') return !!aiCfg.deepseek_api_key;
+    return false;
+  });
+}
+
+aiLoadConfig();
+
+// ═══ UI FUNCTIONS ═══
+function aiToggle() {
+  aiOpen = !aiOpen;
+  document.getElementById('aiPanel').classList.toggle('show', aiOpen);
+  document.getElementById('aiFab').classList.toggle('open', aiOpen);
+  if (aiOpen) document.getElementById('aiInput').focus();
+}
+
+function aiAddMsg(text, who, badge) {
+  var body = document.getElementById('aiBody');
+  var div = document.createElement('div');
+  div.className = 'ai-msg ' + who;
+  if (who === 'bot') {
+    div.innerHTML = text.replace(/\n/g, '<br>');
+    if (badge) div.innerHTML += '<span class="ai-model">' + badge + '</span>';
+  } else { div.textContent = text; }
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function aiShowTyping(on) {
+  var t = document.getElementById('aiTyping');
+  if (t) t.classList.toggle('show', on);
+  document.getElementById('aiBody').scrollTop = document.getElementById('aiBody').scrollHeight;
+}
+
+function aiSetInput(off) {
+  document.getElementById('aiSendBtn').disabled = off;
+  document.getElementById('aiInput').disabled = off;
+}
+
+function aiSendQuick(text) {
+  document.getElementById('aiQuick').style.display = 'none';
+  aiAddMsg(text, 'user');
+  aiCallCascade(text);
+}
+
+function aiSend() {
+  var inp = document.getElementById('aiInput');
+  var text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  document.getElementById('aiQuick').style.display = 'none';
+  aiAddMsg(text, 'user');
+  aiCallCascade(text);
+}
+
+// ═══ КАСКАД: пробуем модели по очереди ═══
+async function aiCallCascade(text) {
+  if (!aiReady) {
+    await aiLoadConfig();
+    if (!aiReady) {
+      aiAddMsg('⚠️ Ни один API ключ не настроен.\nАдминистратор: HUB → Админ-панель → добавьте ключ.\n\nНапишите нам: @AIhroject_bot', 'bot');
+      return;
+    }
+  }
+
+  aiSetInput(true);
+  aiShowTyping(true);
+  aiMessages.push({ role: 'user', content: text });
+  if (aiMessages.length > 20) aiMessages = aiMessages.slice(-20);
+
+  // Детекция "хочу человека" в основном AI чате
+  if (HUMAN_TRIGGERS && HUMAN_TRIGGERS.test(text)) {
+    requestHumanContact(text);
+  }
+
+  var cascade = aiGetCascade();
+  var timeout = parseInt(aiCfg.ai_timeout_ms || '15000');
+  var systemPrompt = aiCfg.ai_knowledge_base || 'Ты ИИ-ассистент RCT. Отвечай на русском.';
+  var lastError = '';
+
+  for (var i = 0; i < cascade.length; i++) {
+    var provider = cascade[i];
+    var t0 = Date.now();
+    try {
+      var result = await aiCallProvider(provider, text, systemPrompt, timeout);
+      var duration = Date.now() - t0;
+
+      // Парсим [LEAD]
+      var reply = result.text;
+      var leadMatch = reply.match(/\[LEAD\](.*?)\[\/LEAD\]/s);
+      if (leadMatch && !aiLeadSaved) {
+        try {
+          var lead = JSON.parse(leadMatch[1]);
+          if (lead.name && lead.phone) { saveLead(lead); aiLeadSaved = true; }
+        } catch(e) {}
+        reply = reply.replace(/\[LEAD\].*?\[\/LEAD\]/s, '').trim();
+      }
+
+      aiShowTyping(false);
+      var badge = result.badge + ' · ' + (duration/1000).toFixed(1) + 'с';
+      aiAddMsg(reply, 'bot', badge);
+      aiMessages.push({ role: 'assistant', content: reply });
+
+      // Логируем успех
+      aiLog('chat', text, reply.substring(0, 500), result.model, provider, duration, '', '', result.tokIn, result.tokOut);
+      aiSetInput(false);
+      document.getElementById('aiInput').focus();
+      return; // Успех — выходим
+
+    } catch(e) {
+      var duration = Date.now() - t0;
+      lastError = provider + ': ' + e.message;
+      aiLog('error', text, '', provider, provider, duration, e.code || 'ERR', e.message);
+      // Пробуем следующую модель
+      continue;
+    }
+  }
+
+  // Все модели упали
+  aiShowTyping(false);
+  aiAddMsg('⚠️ Все ИИ-модели недоступны.\n\nНапишите нам напрямую:\n🤖 @AIhroject_bot\n📧 info@rct-hub.ru\n📱 +7 987 225-52-25', 'bot');
+  aiSetInput(false);
+}
+
+// ═══ ПРОВАЙДЕРЫ ═══
+async function aiCallProvider(provider, text, systemPrompt, timeout) {
+  var msgs = aiMessages.slice(-10);
+
+  if (provider === 'groq') return await aiCallGroq(text, systemPrompt, msgs, timeout);
+  if (provider === 'gemini') return await aiCallGemini(text, systemPrompt, msgs, timeout);
+  if (provider === 'claude') return await aiCallClaude(text, systemPrompt, msgs, timeout);
+  if (provider === 'deepseek') return await aiCallDeepSeek(text, systemPrompt, msgs, timeout);
+  throw { message: 'Unknown provider', code: 'UNKNOWN' };
+}
+
+// ─── GROQ (OpenAI-compatible) ───
+async function aiCallGroq(text, system, msgs, timeout) {
+  var ctrl = new AbortController();
+  var tm = setTimeout(function(){ ctrl.abort(); }, timeout);
+  var model = aiCfg.groq_model || 'llama-3.3-70b-versatile';
+  
+  var apiMsgs = [{ role: 'system', content: system }];
+  msgs.forEach(function(m) { apiMsgs.push({ role: m.role, content: m.content }); });
+
+  var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + aiCfg.groq_api_key },
+    body: JSON.stringify({ model: model, messages: apiMsgs, max_tokens: 1500, temperature: 0.7 }),
+    signal: ctrl.signal
+  });
+  clearTimeout(tm);
+
+  if (!res.ok) { var e = await res.text(); throw { message: e.substring(0, 200), code: String(res.status) }; }
+  var data = await res.json();
+  return {
+    text: data.choices[0].message.content,
+    model: model,
+    badge: '⚡ Groq',
+    tokIn: data.usage?.prompt_tokens || 0,
+    tokOut: data.usage?.completion_tokens || 0
+  };
+}
+
+// ─── GEMINI ───
+async function aiCallGemini(text, system, msgs, timeout) {
+  var ctrl = new AbortController();
+  var tm = setTimeout(function(){ ctrl.abort(); }, timeout);
+  var model = aiCfg.gemini_model || 'gemini-2.0-flash';
+
+  var contents = [];
+  msgs.forEach(function(m) {
+    contents.push({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] });
+  });
+
+  var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + aiCfg.gemini_api_key, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: system }] },
+      contents: contents,
+      generationConfig: { maxOutputTokens: 1500, temperature: 0.7 }
+    }),
+    signal: ctrl.signal
+  });
+  clearTimeout(tm);
+
+  if (!res.ok) { var e = await res.text(); throw { message: e.substring(0, 200), code: String(res.status) }; }
+  var data = await res.json();
+  var reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  if (!reply) throw { message: 'Empty response', code: 'EMPTY' };
+  return {
+    text: reply,
+    model: model,
+    badge: '✨ Gemini',
+    tokIn: data.usageMetadata?.promptTokenCount || 0,
+    tokOut: data.usageMetadata?.candidatesTokenCount || 0
+  };
+}
+
+// ─── CLAUDE ───
+async function aiCallClaude(text, system, msgs, timeout) {
+  var ctrl = new AbortController();
+  var tm = setTimeout(function(){ ctrl.abort(); }, timeout);
+  var isComplex = text.length > 300 || /HTML|код|script|python|программ|подробн|анализ/i.test(text);
+  var model = isComplex ? (aiCfg.claude_model_smart || 'claude-sonnet-4-5-20250929') : (aiCfg.claude_model_fast || 'claude-haiku-4-5-20251001');
+
+  var res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': aiCfg.claude_api_key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model: model, max_tokens: isComplex ? 4000 : 1500, system: system, messages: msgs }),
+    signal: ctrl.signal
+  });
+  clearTimeout(tm);
+
+  if (!res.ok) { var e = await res.text(); throw { message: e.substring(0, 200), code: String(res.status) }; }
+  var data = await res.json();
+  var reply = data.content.map(function(c) { return c.text || ''; }).join('');
+  var modelName = model.includes('haiku') ? 'Haiku' : 'Sonnet';
+  return {
+    text: reply,
+    model: model,
+    badge: '🧠 Claude ' + modelName,
+    tokIn: data.usage?.input_tokens || 0,
+    tokOut: data.usage?.output_tokens || 0
+  };
+}
+
+// ─── DEEPSEEK (OpenAI-compatible) ───
+async function aiCallDeepSeek(text, system, msgs, timeout) {
+  var ctrl = new AbortController();
+  var tm = setTimeout(function(){ ctrl.abort(); }, timeout);
+  var model = aiCfg.deepseek_model || 'deepseek-chat';
+
+  var apiMsgs = [{ role: 'system', content: system }];
+  msgs.forEach(function(m) { apiMsgs.push({ role: m.role, content: m.content }); });
+
+  var res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + aiCfg.deepseek_api_key },
+    body: JSON.stringify({ model: model, messages: apiMsgs, max_tokens: 1500, temperature: 0.7 }),
+    signal: ctrl.signal
+  });
+  clearTimeout(tm);
+
+  if (!res.ok) { var e = await res.text(); throw { message: e.substring(0, 200), code: String(res.status) }; }
+  var data = await res.json();
+  return {
+    text: data.choices[0].message.content,
+    model: model,
+    badge: '🐋 DeepSeek',
+    tokIn: data.usage?.prompt_tokens || 0,
+    tokOut: data.usage?.completion_tokens || 0
+  };
+}
+
+// ═══ ЛОГИРОВАНИЕ ═══
+function aiLog(type, userMsg, botReply, model, provider, duration, errCode, errMessage, tokIn, tokOut) {
+  try {
+    fetch(AI_SB.url + '/rest/v1/ai_logs', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'apikey':AI_SB.key, 'Authorization':'Bearer '+AI_SB.key, 'Prefer':'return=minimal' },
+      body: JSON.stringify({
+        type: type, source: 'web', session_id: aiSession,
+        user_message: (userMsg||'').substring(0, 1000),
+        bot_reply: (botReply||'').substring(0, 2000),
+        model: model||'', provider: provider||'',
+        duration_ms: duration||0,
+        tokens_in: tokIn||0, tokens_out: tokOut||0,
+        error_code: errCode||'', error_message: (errMessage||'').substring(0, 1000),
+        page: location.pathname
+      })
+    });
+  } catch(e) {}
+}
+
+// ═══ СОХРАНЕНИЕ ЛИДА ═══
+async function saveLead(lead) {
+  var dir = lead.direction || 'Не указано';
+  var project = DIR_MAP[dir] || 'Сайты';
+  var dirId = 'DIR' + Date.now().toString(36).toUpperCase();
+  var h = { 'Content-Type':'application/json', 'apikey':AI_SB.key, 'Authorization':'Bearer '+AI_SB.key, 'Prefer':'return=minimal' };
+
+  try { await fetch(AI_SB.url+'/rest/v1/directions',{method:'POST',headers:h,body:JSON.stringify({id:dirId,name:lead.name,project:project,status:'Новый',stage:'prospect',phone:lead.phone,city:lead.city||'',description:lead.comment||'Заявка из ИИ-чата',source:'ИИ-чат ('+location.pathname+')'})}); } catch(e){}
+  try { await fetch(AI_SB.url+'/rest/v1/client_requests',{method:'POST',headers:h,body:JSON.stringify({name:lead.name,phone:lead.phone,direction:dir,city:lead.city||'',comment:lead.comment||'',source:'ai_chat',page:location.pathname,session_id:aiSession,status:'new'})}); } catch(e){}
+
+  var webhookUrl = aiCfg.n8n_webhook_url || 'https://daniyal2212.app.n8n.cloud/webhook/rkt-ai';
+  try { fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'telegram_notify',chat_id:aiCfg.telegram_ceo_chat_id||'798494835',message:'\ud83c\udd95 Заявка с ИИ-чата!\n\n\ud83d\udc64 '+lead.name+'\n\ud83d\udcf1 '+lead.phone+'\n\ud83d\udccb '+dir+' → '+project+'\n\ud83c\udfd9 '+(lead.city||'—')+'\n\ud83d\udcac '+(lead.comment||'—'),chatId:aiCfg.telegram_ceo_chat_id||'798494835'})}); } catch(e){}
+
+  aiLog('lead', lead.name+' | '+lead.phone, dir, '', '', 0, '', '');
+}
+
+</script>
+</body></html>
