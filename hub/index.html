@@ -1677,8 +1677,9 @@ tbody tr:last-child td { border-bottom: none; }
   .btn { padding: 10px 14px !important; font-size: 13px !important; }
   .page-header .actions { flex-wrap: wrap; gap: 6px; }
   .login-card { padding: 24px 16px !important; }
-  /* Even more compact kanban */
-  .kanban-col { min-width: 260px !important; flex: 0 0 260px !important; }
+  /* Even more compact kanban + scroll-snap */
+  .kanban-wrap { scroll-snap-type: x mandatory; }
+  .kanban-col { min-width: 260px !important; flex: 0 0 260px !important; scroll-snap-align: start; }
   .kanban-card { padding: 8px 10px !important; }
   /* Stack details vertically */
   .so-detail-item { grid-column: span 2 !important; }
@@ -1754,7 +1755,7 @@ tbody tr:last-child td { border-bottom: none; }
 }
 
 /* ============== PIPELINE (vertical for Sites) ============== */
-.kanban-wrap{display:flex;gap:10px;overflow-x:auto;padding:12px 0;min-height:400px}
+.kanban-wrap{display:flex;gap:10px;overflow-x:auto;padding:12px 0;min-height:400px;-webkit-overflow-scrolling:touch}
 .kanban-col{min-width:220px;max-width:240px;flex:0 0 220px;background:var(--bg3);border-radius:var(--radius);display:flex;flex-direction:column;border:1px solid var(--border)}
 .kanban-col-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700}
 .kanban-col-header .k-count{background:var(--bg);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
@@ -1773,6 +1774,9 @@ tbody tr:last-child td { border-bottom: none; }
 .kanban-card .k-manager{color:var(--text2)}
 .kanban-card .k-delete-btn{position:absolute;top:4px;right:4px;background:none;border:none;cursor:pointer;font-size:12px;opacity:0;transition:opacity .2s;padding:2px 4px;border-radius:4px}
 .kanban-card:hover .k-delete-btn{opacity:.6}
+.k-ai-btns{display:flex;gap:4px;margin-top:6px}
+.k-ai-btns button{flex:1;padding:3px 6px;font-size:10px;border:1px solid var(--border);background:transparent;color:var(--text3);border-radius:4px;cursor:pointer;font-family:inherit;transition:all .2s}
+.k-ai-btns button:hover{background:rgba(0,212,170,.12);border-color:var(--accent);color:var(--accent)}
 .kanban-card .k-delete-btn:hover{opacity:1;background:rgba(231,76,60,.15)}
 .kanban-card.dragging{opacity:.5;transform:rotate(2deg)}
 .kanban-col.drag-over{background:rgba(0,212,170,.08);border-color:var(--accent)}
@@ -1801,10 +1805,13 @@ tbody tr:last-child td { border-bottom: none; }
 .so-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
 .so-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
 .so-body{flex:1;overflow-y:auto;padding:20px 24px}
-.so-progress{display:flex;gap:2px;margin:16px 0}
-.so-progress .so-step{flex:1;height:6px;border-radius:3px;background:var(--bg3);cursor:pointer;transition:background .2s}
-.so-progress .so-step.active{background:var(--accent)}
-.so-progress .so-step.done{background:var(--green)}
+.so-progress{display:flex;align-items:center;margin:16px 0;padding:2px 0;overflow-x:auto}
+.so-progress .so-step{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);background:var(--bg3);cursor:pointer;transition:all .15s;flex-shrink:0}
+.so-progress .so-step:hover{border-color:var(--accent)}
+.so-progress .so-step.active{border-color:var(--accent);background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
+.so-progress .so-step.done{border-color:var(--green);background:var(--green)}
+.so-progress .so-line{flex:1;height:2px;background:var(--border);transition:background .2s;min-width:6px}
+.so-progress .so-line.done{background:var(--green)}
 .so-stage-labels{display:flex;justify-content:space-between;margin-bottom:16px}
 .so-stage-labels span{font-size:9px;color:var(--text3);text-align:center;flex:1}
 .so-section{margin-bottom:20px}
@@ -2086,37 +2093,39 @@ tbody tr:last-child td { border-bottom: none; }
       <!-- Dynamic project items rendered by renderSidebarProjects() -->
       <div id="sidebarProjectsList"></div>
 
-      <div class="nav-section">Данные</div>
-      <a class="nav-item" onclick="showPage('clients')" data-page="clients">
-        <span class="icon">👥</span><span class="label">Клиенты</span>
-        <span class="badge" id="badge-clients">0</span>
-      </a>
-      <a class="nav-item" onclick="showPage('partners')" data-page="partners">
-        <span class="icon">🤝</span><span class="label">Партнёры</span>
-        <span class="badge" id="badge-partners">0</span>
+      <div class="nav-section">Работа</div>
+      <a class="nav-item" onclick="showPage('kanban')" data-page="kanban">
+        <span class="icon">🔄</span><span class="label">Сделки</span>
+        <span class="badge" id="badge-deals">0</span>
       </a>
       <a class="nav-item" onclick="showPage('tasks')" data-page="tasks">
         <span class="icon">✅</span><span class="label">Задачи</span>
         <span class="badge" id="badge-tasks">0</span>
       </a>
-      <a class="nav-item" onclick="showPage('comms')" data-page="comms">
-        <span class="icon">💬</span><span class="label">Коммуникации</span>
+      <a class="nav-item" onclick="showPage('clients')" data-page="clients">
+        <span class="icon">👥</span><span class="label">Клиенты</span>
+        <span class="badge" id="badge-clients">0</span>
       </a>
       <a class="nav-item" onclick="showPage('leads')" data-page="leads" id="nav-leads">
         <span class="icon">📝</span><span class="label">Заявки</span>
         <span class="badge" id="badge-leads">0</span>
       </a>
+      <a class="nav-item" onclick="showPage('partners')" data-page="partners">
+        <span class="icon">🤝</span><span class="label">Партнёры</span>
+        <span class="badge" id="badge-partners">0</span>
+      </a>
+      <a class="nav-item" onclick="showPage('comms')" data-page="comms">
+        <span class="icon">💬</span><span class="label">Коммуникации</span>
+      </a>
 
-      <div class="nav-section">Управление</div>
+      <div class="nav-section">Система</div>
       <a class="nav-item" onclick="showPage('staff')" data-page="staff" id="nav-staff">
-        <span class="icon">👥</span><span class="label">Сотрудники</span>
+        <span class="icon">👤</span><span class="label">Сотрудники</span>
       </a>
       <a class="nav-item" onclick="showPage('approvals')" data-page="approvals" id="nav-approvals">
         <span class="icon">📋</span><span class="label">Согласования</span>
         <span class="badge badge-orange" id="badge-approvals">0</span>
       </a>
-
-      <div class="nav-section">Система</div>
       <a class="nav-item" onclick="showPage('settings')" data-page="settings">
         <span class="icon">⚙️</span><span class="label">Настройки</span>
       </a>
@@ -2697,6 +2706,7 @@ tbody tr:last-child td { border-bottom: none; }
       <div class="so-actions" id="so-actions"></div>
     </div>
     <div id="so-rkt-crm"></div>
+    <div id="so-touch-log"></div>
     <div class="so-section">
       <h4>📋 Задачи</h4>
       <ul class="so-checklist" id="so-tasks"></ul>
@@ -2902,7 +2912,8 @@ const COL_MAP = {
     contract_amount:'Сумма контракта',
     procurement_type:'Тип закупки',
     procurement_deadline:'Дедлайн закупки',
-    procurement_number:'Номер закупки'
+    procurement_number:'Номер закупки',
+    touch_log:'История касаний'
   },
   tasks: {
     id:'ID', description:'Описание', direction:'Направление', project:'Проект',
@@ -3915,24 +3926,46 @@ function findStaffByInput(input) {
 // ---- PASSWORD LOGIN ----
 
 // ============================================================
-// BRUTE-FORCE PROTECTION
+// BRUTE-FORCE PROTECTION  (sessionStorage — persists on reload)
 // ============================================================
-const LOGIN_ATTEMPTS = {};
 const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_MS = 5 * 60 * 1000;
+const LOCKOUT_MS = 5 * 60 * 1000; // 5 минут
 
 function checkLoginRate(identifier) {
+  const key = 'rkt_login_' + identifier.toLowerCase();
   const now = Date.now();
-  if (!LOGIN_ATTEMPTS[identifier]) LOGIN_ATTEMPTS[identifier] = { count: 0, first: now };
-  const r = LOGIN_ATTEMPTS[identifier];
-  if (now - r.first > LOCKOUT_MS) { r.count = 0; r.first = now; }
-  r.count++;
-  if (r.count > MAX_LOGIN_ATTEMPTS) {
-    return { blocked: true, sec: Math.ceil((LOCKOUT_MS - (now - r.first)) / 1000) };
+  let state = {};
+  try { state = JSON.parse(sessionStorage.getItem(key) || '{}'); } catch(e) {}
+
+  // Уже заблокирован
+  if (state.blockedUntil && now < state.blockedUntil) {
+    return { blocked: true, sec: Math.ceil((state.blockedUntil - now) / 1000) };
   }
-  return { blocked: false };
+  // Разблокирован: снять флаг блокировки если время вышло
+  if (state.blockedUntil && now >= state.blockedUntil) {
+    state = {};
+  }
+  // Сбросить окно если оно старше LOCKOUT_MS
+  if (state.first && now - state.first > LOCKOUT_MS) {
+    state = {};
+  }
+
+  state.count = (state.count || 0) + 1;
+  if (!state.first) state.first = now;
+
+  if (state.count >= MAX_LOGIN_ATTEMPTS) {
+    state.blockedUntil = now + LOCKOUT_MS;
+    sessionStorage.setItem(key, JSON.stringify(state));
+    return { blocked: true, sec: Math.ceil(LOCKOUT_MS / 1000), fresh: true };
+  }
+
+  sessionStorage.setItem(key, JSON.stringify(state));
+  return { blocked: false, attemptsLeft: MAX_LOGIN_ATTEMPTS - state.count };
 }
-function resetLoginRate(id) { delete LOGIN_ATTEMPTS[id]; }
+
+function resetLoginRate(identifier) {
+  sessionStorage.removeItem('rkt_login_' + identifier.toLowerCase());
+}
 
 async function doPasswordLogin() {
   const id = document.getElementById('loginId').value.trim();
@@ -3943,7 +3976,14 @@ async function doPasswordLogin() {
   if (!SB) { showLoginErr('⚠️ Нет подключения к базе данных. Проверьте интернет и обновите страницу.'); return; }
   if (!id) { showLoginErr('Введите телефон, @тег или email'); return; }
   var _rate = checkLoginRate(id.toLowerCase());
-  if (_rate.blocked) { showLoginErr('Слишком много попыток. Подождите ' + _rate.sec + ' сек.'); return; }
+  if (_rate.blocked) {
+    const waitMin = Math.ceil(_rate.sec / 60);
+    const waitMsg = _rate.sec > 90
+      ? waitMin + ' мин.'
+      : _rate.sec + ' сек.';
+    showLoginErr('🔒 Слишком много попыток. Подождите ' + waitMsg);
+    return;
+  }
   if (!pass) { showLoginErr('Введите пароль'); return; }
   
   document.getElementById('loginBtnText').textContent = '⏳ Вход...';
@@ -3982,23 +4022,26 @@ async function doPasswordLogin() {
         const cached = _staffCache.find(s => (s.ID||s.id) === (staff.ID||staff.id));
         if (cached) cached['pin_hash'] = hash;
         showLoginErr('✅ Пароль установлен! Входим...', 'var(--green)');
+        resetLoginRate(id);
         setTimeout(() => completeLogin(staff), 500);
         return;
       } catch(e2) {
         // pin_hash column may not exist — login without password check
         console.warn('Cannot set password, pin_hash column may not exist:', e2);
+        resetLoginRate(id);
         completeLogin(staff);
         return;
       }
     }
-    
+
     if (hash !== staff['pin_hash']) {
       showLoginErr('Неверный пароль');
       document.getElementById('loginBtnText').textContent = 'Войти';
       return;
     }
-    
+
     // Success!
+    resetLoginRate(id);
     completeLogin(staff);
     
   } catch(e) {
@@ -5008,15 +5051,37 @@ function renderAll() {
 
 
 function updateBadges() {
+  const td = today();
   const fp = filterByRole(DATA.partners);
-  const ft = filterByRole(DATA.tasks).filter(t => (t['Статус']||'')!=='Готово');
+  const allActiveTasks = filterByRole(DATA.tasks).filter(t => {
+    const st = t['Статус']||'';
+    return st !== 'Готово' && st !== '✅ Готово';
+  });
+  const overdueTasks = allActiveTasks.filter(t => t['Дедлайн'] && t['Дедлайн'] < td);
   const pa = DATA.approvals.filter(a => (a['Статус']||'').includes('Ожидает'));
   const fd = filterByRole(DATA.directions || []);
+
   document.getElementById('badge-partners').textContent = fp.length;
-  document.getElementById('badge-tasks').textContent = ft.length;
+
+  const taskBadge = document.getElementById('badge-tasks');
+  if (taskBadge) {
+    const hasOverdue = overdueTasks.length > 0;
+    taskBadge.textContent = hasOverdue ? overdueTasks.length : allActiveTasks.length;
+    taskBadge.className = 'badge' + (hasOverdue ? ' badge-red' : '');
+    taskBadge.title = hasOverdue
+      ? overdueTasks.length + ' просроченных задач'
+      : allActiveTasks.length + ' активных задач';
+  }
+
   document.getElementById('badge-approvals').textContent = pa.length;
   var bc = document.getElementById('badge-clients');
   if (bc) bc.textContent = fd.length;
+  var bd = document.getElementById('badge-deals');
+  if (bd) {
+    var activeDealsCount = fd.filter(function(d) { return d['stage'] !== 'done' && d['stage'] !== 'lost'; }).length;
+    bd.textContent = activeDealsCount;
+    bd.className = 'badge' + (activeDealsCount > 0 ? '' : ' badge-hidden');
+  }
 }
 
 // ============================================================
@@ -5994,6 +6059,30 @@ function renderDashboard() {
         kpi += '<div style="margin-top:16px;padding:12px;background:rgba(255,107,107,0.1);border-radius:10px;border:1px solid rgba(255,107,107,0.2)">';
         kpi += '<span style="color:var(--red,#ff6b6b);font-weight:600">⚠️ Просроченных follow-up: ' + overdueFollowups.length + '</span>';
         kpi += '</div>';
+      }
+      // Per-stage funnel bars
+      if (totalLeads > 0) {
+        kpi += '<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">';
+        kpi += '<div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:600">📊 Воронка по этапам</div>';
+        STAGES.filter(function(s) { return s.id !== 'lost'; }).forEach(function(s) {
+          var cnt = siteDirs.filter(function(d) { return (d['stage']||'prospect') === s.id; }).length;
+          var pct = totalLeads > 0 ? Math.round(cnt / totalLeads * 100) : 0;
+          kpi += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">';
+          kpi += '<div style="font-size:11px;color:var(--text2);width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + s.name + '</div>';
+          kpi += '<div style="flex:1;height:5px;background:var(--bg);border-radius:3px"><div style="width:' + pct + '%;height:100%;background:' + s.color + ';border-radius:3px;transition:width .3s"></div></div>';
+          kpi += '<div style="font-size:11px;color:var(--text3);width:24px;text-align:right">' + cnt + '</div>';
+          kpi += '</div>';
+        });
+        kpi += '</div>';
+      }
+      // Average deal cycle
+      var closedWithDates = siteDirs.filter(function(d) { return d['stage'] === 'done' && (d['Дата добавления'] || d['Создан'] || d['created_at']); });
+      if (closedWithDates.length > 0) {
+        var avgDays = Math.round(closedWithDates.reduce(function(sum, d) {
+          var created = new Date(d['Дата добавления'] || d['Создан'] || d['created_at']);
+          return sum + (isNaN(created.getTime()) ? 30 : Math.max(1, Math.round((Date.now() - created.getTime()) / 86400000)));
+        }, 0) / closedWithDates.length);
+        kpi += '<div style="margin-top:8px;font-size:12px;color:var(--text2)">⏱ Средний цикл сделки: <b style="color:var(--accent)">' + avgDays + ' дней</b></div>';
       }
       kpi += '</div>';
       var dashEl = document.getElementById('dashboardPage');
@@ -13547,19 +13636,21 @@ function renderKanban() {
   }
 
   let html = '';
-  STAGES.forEach(stage => {
+  STAGES.forEach((stage, stageIdx) => {
     const deals = filtered.filter(d => (d['stage']||'prospect') === stage.id);
     const sum = deals.reduce((s,d) => s + (Number(d['Цена'])||0), 0);
-    html += `<div class="kanban-col" data-stage="${stage.id}" ondragover="kanbanDragOver(event)" ondrop="kanbanDrop(event,this)" ondragleave="this.classList.remove('drag-over')">
-      <div class="kanban-col-header">
-        <div>${stage.name} <span class="k-count">${deals.length}</span></div>
+    const stageNum = stageIdx + 1;
+    html += `<div class="kanban-col" data-stage="${stage.id}" ondragover="kanbanDragOver(event)" ondrop="kanbanDrop(event,this)" ondragleave="this.classList.remove('drag-over')" style="border-top:3px solid ${stage.color}">
+      <div class="kanban-col-header" title="${esc(stage.tip||'')}">
+        <div><span style="color:${stage.color};font-weight:800;margin-right:4px">${stageNum}.</span>${stage.name} <span class="k-count">${deals.length}</span></div>
         <div class="k-sum">${sum ? sum.toLocaleString('ru')+'₽' : ''}</div>
       </div>
       <div class="kanban-col-body">`;
     deals.forEach(d => {
       const id = d['ID']||d.id||'';
       const overdue = d['Дедлайн'] && d['Дедлайн'] < td && stage.id !== 'done';
-      html += `<div class="kanban-card${overdue?' overdue':''}" draggable="true" data-id="${id}" onclick="openSlideOver('${escA(id)}')" ondragstart="kanbanDragStart(event,this)" ondragend="kanbanDragEnd(this)">
+      const cardBorderColor = overdue ? 'var(--red)' : stage.color;
+      html += `<div class="kanban-card${overdue?' overdue':''}" draggable="true" data-id="${id}" onclick="openSlideOver('${escA(id)}')" ondragstart="kanbanDragStart(event,this)" ondragend="kanbanDragEnd(this)" style="border-left:4px solid ${cardBorderColor}">
         <div class="k-name">${esc(d['Название']||d['name']||'?')}</div>
         <div class="k-meta">
           ${d['Цена']?'<span class="k-price">'+Number(d['Цена']).toLocaleString('ru')+'₽</span>':''}
@@ -13568,6 +13659,10 @@ function renderKanban() {
           ${d['Оплачено']?'<span class="k-paid">💰</span>':'<span class="k-unpaid">⏳</span>'}
           ${d['Менеджер']?'<span class="k-manager">👤'+esc(d['Менеджер'])+'</span>':''}
         </div>
+        <div class="k-ai-btns">
+          <button onclick="event.stopPropagation();aiSummary('${escA(id)}')" title="AI-сводка по клиенту">🤖 Итог</button>
+          <button onclick="event.stopPropagation();aiNextStep('${escA(id)}')" title="AI рекомендует следующий шаг">💡 Шаг</button>
+        </div>
         ${getUserPerms().canDelete ? '<button class="k-delete-btn" onclick="event.stopPropagation();confirmDelete(\'direction\',\''+escA(id)+'\',\''+escA(d['Название']||'')+'\')" title="Удалить клиента">🗑</button>' : ''}
         <div class="k-mobile-move" style="display:none"><button onclick="event.stopPropagation();moveKanbanCard('${escA(id)}','left')" title="← Предыдущий этап">◀</button><button onclick="event.stopPropagation();moveKanbanCard('${escA(id)}','right')" title="Следующий этап →">▶</button></div>
       </div>`;
@@ -13575,6 +13670,22 @@ function renderKanban() {
     html += '</div></div>';
   });
   container.innerHTML = html;
+
+  // Подсказка при первом входе
+  if (!localStorage.getItem('rkt_kanban_hint')) {
+    const hint = document.createElement('div');
+    hint.id = 'kanban-hint';
+    hint.style.cssText = 'position:sticky;bottom:12px;left:0;right:0;margin:8px 0 0;background:rgba(0,212,170,.12);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);cursor:pointer;z-index:10';
+    hint.innerHTML = '<span style="font-size:18px">👆</span><span>Перетащите карточку вправо для перехода к следующему этапу. На мобильном — листайте горизонтально.</span><button onclick="event.stopPropagation();dismissKanbanHint()" style="margin-left:auto;background:none;border:none;color:var(--accent);cursor:pointer;font-size:18px;line-height:1" title="Закрыть">✕</button>';
+    hint.onclick = dismissKanbanHint;
+    container.appendChild(hint);
+  }
+}
+
+function dismissKanbanHint() {
+  localStorage.setItem('rkt_kanban_hint', '1');
+  const h = document.getElementById('kanban-hint');
+  if (h) h.remove();
 }
 
 function kanbanDragStart(e, el) {
@@ -13702,9 +13813,10 @@ function openSlideOver(id) {
   document.getElementById('so-name').textContent = dir['Название']||'?';
   document.getElementById('so-type').textContent = (dir['Тип сайта']||'—') + ' · ' + (dir['Город']||'—');
 
-  // Progress bar
+  // Progress bar — circles with connecting lines
   document.getElementById('so-progress').innerHTML = STAGES.map((s,i) =>
-    `<div class="so-step ${i<stageIdx?'done':''} ${i===stageIdx?'active':''}" title="${s.name}" onclick="setDealStage('${id}','${s.id}')"></div>`
+    (i > 0 ? `<div class="so-line ${i<=stageIdx?'done':''}"></div>` : '') +
+    `<div class="so-step ${i<stageIdx?'done':''} ${i===stageIdx?'active':''}" title="${s.name}" onclick="setDealStageConfirm('${id}','${s.id}','${s.name.replace(/'/g,"\\'").replace(/`/g,'\\`')}')"></div>`
   ).join('');
   document.getElementById('so-stage-labels').innerHTML = STAGES.map(s =>
     `<span>${s.name.replace(/[^\s\wА-Яа-яёЁ]/g,'').trim()}</span>`
@@ -13768,6 +13880,8 @@ function openSlideOver(id) {
     ${!dir['Оплачено']&&p.canWrite?'<button onclick="markPaid(\''+id+'\')">💰 Оплата</button>':''}
     ${stage!=='lost'&&stage!=='done'?'<button onclick="rejectDeal(\''+id+'\')" style="background:rgba(255,75,75,.15);color:var(--red)">❌ Отказ</button>':''}
     ${p.canDelete?'<button onclick="confirmDelete(\'direction\',\''+escA(id)+'\',\''+escA(dir['Название']||'')+'\')" style="background:rgba(231,76,60,.15);color:var(--red)">🗑 Удалить</button>':''}
+    <button id="so-ai-summary-btn" onclick="aiSummary('${id}')" style="background:rgba(0,212,170,.08);border-color:var(--accent);color:var(--accent)">🤖 AI Итог</button>
+    <button id="so-ai-nextstep-btn" onclick="aiNextStep('${id}')" style="background:rgba(77,171,247,.08);border-color:var(--blue);color:var(--blue)">💡 AI Следующий шаг</button>
   `;
 
   // Tasks checklist
@@ -13792,6 +13906,28 @@ function openSlideOver(id) {
     rktCrmEl.innerHTML = buildRktCrmHtml(id, dir);
   } else {
     rktCrmEl.innerHTML = '';
+  }
+
+  // Touch timeline (history)
+  const touchLogEl = document.getElementById('so-touch-log');
+  if (touchLogEl) {
+    let tlog = [];
+    try { tlog = JSON.parse(dir['История касаний'] || '[]'); } catch(e) {}
+    if (Array.isArray(tlog) && tlog.length > 0) {
+      const typeIcon = { call:'📞', msg:'💬', email:'📧' };
+      touchLogEl.innerHTML = `<div class="so-section"><h4>📞 История касаний (${tlog.length})</h4><div style="display:flex;flex-direction:column;gap:5px">${
+        tlog.slice().reverse().map(entry => {
+          const icon = typeIcon[entry.type] || '📞';
+          return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:8px;font-size:12px">
+            <span>${icon}</span>
+            <div style="flex:1;font-weight:600">Касание #${entry.n}${entry.note ? ' — ' + esc(entry.note) : ''}</div>
+            <div style="color:var(--text3);white-space:nowrap">${formatDateRu(entry.date)}</div>
+          </div>`;
+        }).join('')
+      }</div></div>`;
+    } else {
+      touchLogEl.innerHTML = '';
+    }
   }
 
   document.getElementById('slideoverOverlay').classList.add('open');
@@ -13968,6 +14104,84 @@ async function setRktLogistics(id, step) {
   }
 }
 
+// ── Этап 3.3: AI Action Buttons ──────────────────────────────────────────────
+
+async function aiSummary(leadId) {
+  const lead = (DATA.directions||[]).find(d => (d['ID']||d.id) === leadId);
+  if (!lead) return;
+  const btn = document.getElementById('so-ai-summary-btn');
+  const origText = btn ? btn.textContent : '';
+  if (btn) btn.textContent = '⏳ Загрузка...';
+  try {
+    const resp = await fetch(CONFIG.AI_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        action: 'ai_assist',
+        type: 'summary',
+        lead_id: leadId,
+        message: 'Дай краткую сводку по клиенту: ' + JSON.stringify({
+          Название: lead['Название'],
+          Проект:   lead['Проект'],
+          Этап:     lead['stage'],
+          Цена:     lead['Цена'],
+          Касания:  lead['Касания'],
+          'Следующий контакт': lead['Следующий контакт'],
+          Менеджер: lead['Менеджер'],
+          Описание: lead['Описание'],
+          Фидбек:   lead['Фидбек']
+        })
+      })
+    });
+    const data = await resp.json().catch(() => ({}));
+    const reply = data.reply || data.text || data.message || data.output || 'AI не вернул ответ.';
+    showCustomModal('🤖 AI Итог — ' + esc(lead['Название']||''), `
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;font-size:14px;line-height:1.6;white-space:pre-wrap;color:var(--text)">${esc(reply)}</div>
+    `, null);
+  } catch(err) {
+    toast('❌ AI недоступен: ' + err.message, 'error');
+  } finally {
+    if (btn) btn.textContent = origText;
+  }
+}
+
+async function aiNextStep(leadId) {
+  const lead = (DATA.directions||[]).find(d => (d['ID']||d.id) === leadId);
+  if (!lead) return;
+  const btn = document.getElementById('so-ai-nextstep-btn');
+  const origText = btn ? btn.textContent : '';
+  if (btn) btn.textContent = '⏳ Анализ...';
+  try {
+    const resp = await fetch(CONFIG.AI_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        action: 'ai_assist',
+        type: 'next_step',
+        lead_id: leadId,
+        message: 'Что делать дальше с этим клиентом? Рекомендуй конкретное действие: ' + JSON.stringify({
+          Название: lead['Название'],
+          Этап:     lead['stage'],
+          Касания:  lead['Касания'],
+          'Следующий контакт': lead['Следующий контакт'],
+          Описание: lead['Описание'],
+          Фидбек:   lead['Фидбек'],
+          'Причина отказа': lead['Причина отказа']
+        })
+      })
+    });
+    const data = await resp.json().catch(() => ({}));
+    const reply = data.reply || data.text || data.message || data.output || 'AI не вернул ответ.';
+    showCustomModal('💡 AI Следующий шаг — ' + esc(lead['Название']||''), `
+      <div style="background:rgba(77,171,247,.06);border:1px solid var(--blue);border-radius:8px;padding:14px;font-size:14px;line-height:1.6;white-space:pre-wrap;color:var(--text)">${esc(reply)}</div>
+    `, null);
+  } catch(err) {
+    toast('❌ AI недоступен: ' + err.message, 'error');
+  } finally {
+    if (btn) btn.textContent = origText;
+  }
+}
+
 // Mapping: deal stage → which SITE_PIPELINE steps should be completed by this stage
 const STAGE_TO_STEPS = {
   'prospect':     { complete: [],         active: [1] },
@@ -14092,8 +14306,18 @@ async function advanceDealStage() {
   const cur = dir['stage']||'prospect';
   const idx = STAGES.findIndex(s=>s.id===cur);
   if (idx < STAGES.length - 1) {
-    await setDealStage(currentDealId, STAGES[idx+1].id);
+    const nextStage = STAGES[idx+1];
+    if (!confirm(`Переместить «${dir['Название']||currentDealId}» → «${nextStage.name}»?`)) return;
+    await setDealStage(currentDealId, nextStage.id);
   }
+}
+
+function setDealStageConfirm(id, newStage, stageName) {
+  const dir = (DATA.directions||[]).find(d => (d['ID']||d.id) === id);
+  if (!dir) return;
+  const oldName = STAGES.find(s=>s.id===(dir['stage']||'prospect'))?.name || dir['stage'];
+  if (!confirm(`Переместить «${dir['Название']||id}»\n${oldName} → ${stageName}?`)) return;
+  setDealStage(id, newStage);
 }
 
 async function markPaid(id) {
@@ -14124,9 +14348,18 @@ async function logTouch(id) {
   const nextDays = intervals[Math.min(touches-1, intervals.length-1)];
   const nextDate = addDays(today(), nextDays);
   dir['Следующий контакт'] = nextDate;
+  // Append to touch log (history)
+  let touchLog = [];
+  try { touchLog = JSON.parse(dir['История касаний'] || '[]'); } catch(e) {}
+  if (!Array.isArray(touchLog)) touchLog = [];
+  touchLog.push({ date: today(), n: touches, type: 'call', note: '' });
+  dir['История касаний'] = JSON.stringify(touchLog);
   try {
     const dbId = dir['ID'] || dir._dbId || dir.id;
-    await SB.from('directions').update({touches: touches, next_contact: nextDate}).eq('id', dbId);
+    const baseUpdate = { touches, next_contact: nextDate };
+    // Try with touch_log column first; gracefully fall back if column doesn't exist
+    const { error: e1 } = await SB.from('directions').update({ ...baseUpdate, touch_log: touchLog }).eq('id', dbId);
+    if (e1) await SB.from('directions').update(baseUpdate).eq('id', dbId);
     toast('📞 Касание #'+touches+' записано. Следующий звонок: '+nextDate);
     // Уведомить менеджера в Telegram
     const mgr = dir['Менеджер'];
