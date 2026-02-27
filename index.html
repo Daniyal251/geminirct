@@ -239,13 +239,13 @@ document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
 <!-- AI CHAT v10 Multi-LLM -->
 <button class="ai-fab" id="aiFab" onclick="aiToggle()" aria-label="ИИ-ассистент">🤖</button>
 <div class="ai-panel" id="aiPanel">
-  <div class="ai-head"><div class="ai-head-dot"></div><div class="ai-head-info"><div class="ai-head-title">🤖 ИИ-ассистент RCT</div><div class="ai-head-sub">Multi-AI · Groq + Gemini + Claude + DeepSeek</div></div><button class="ai-close" onclick="aiToggle()">✕</button></div>
-  <div class="ai-body" id="aiBody"><div class="ai-msg bot">Здравствуйте! 👋 Я ИИ-ассистент RCT.<br><br>Расскажу об услугах, ценах, сроках — спрашивайте!</div></div>
+  <div class="ai-head"><div class="ai-head-dot"></div><div class="ai-head-info"><div class="ai-head-title">🤖 ИИ‑бриф за 3 минуты</div><div class="ai-head-sub">Помогу собрать вводные и подготовить предложение</div></div><button class="ai-close" onclick="aiToggle()">✕</button></div>
+  <div class="ai-body" id="aiBody"><div class="ai-msg bot">Здравствуйте! 👋 Я помогу быстро собрать бриф по вашему запросу.<br><br>Ответьте на несколько вопросов — и мы подготовим для вас понятное предложение по цене и срокам.</div></div>
   <div class="ai-quick" id="aiQuick">
-    <button class="ai-quick-btn" onclick="aiSendQuick('Сколько стоит сайт?')">💰 Цены</button>
-    <button class="ai-quick-btn" onclick="aiSendQuick('Расскажите о медоборудовании')">🏥 Мед</button>
-    <button class="ai-quick-btn" onclick="aiSendQuick('Что такое AI-контент?')">🎬 Контент</button>
-    <button class="ai-quick-btn" onclick="aiSendQuick('Хочу заказать')">📝 Заказать</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Хочу сайт: помоги собрать бриф и прикинуть цену')">🌐 Собрать бриф по сайту</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Нужно медоборудование: помоги уточнить задачу и бюджет')">🏥 Медоборудование</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Нужен AI-контент: помоги сформулировать запрос')">🎬 AI‑контент</button>
+    <button class="ai-quick-btn" onclick="aiSendQuick('Хочу заказать: задай вопросы и помоги оформить заявку')">📝 Оформить заявку</button>
   </div>
   <div class="ai-typing" id="aiTyping"><span></span><span></span><span></span></div>
   <div class="ai-foot"><input id="aiInput" placeholder="Задайте вопрос..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"><button id="aiSendBtn" onclick="aiSend()">➤</button></div>
