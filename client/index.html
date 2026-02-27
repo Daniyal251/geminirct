@@ -273,7 +273,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <!-- Dashboard -->
     <div class="page active" id="page-dashboard">
       <div class="dash-welcome" id="dash-greeting">Добро пожаловать!</div>
-      <div class="dash-sub">Здесь вы видите свои проекты и заявки</div>
+      <div class="dash-sub">Здесь вы видите свои проекты и заявки. Если вы только что оставили заявку на сайте, проект появится здесь после первичной обработки менеджером.</div>
       <div class="stats-row">
         <div class="stat-card stat-card--blue"><div class="stat-num" id="stat-projects">0</div><div class="stat-label">Проектов</div></div>
         <div class="stat-card stat-card--green"><div class="stat-num" id="stat-active">0</div><div class="stat-label">Активных</div></div>
@@ -655,7 +655,7 @@ function renderDashboard() {
   // Recent projects
   const container = document.getElementById('dash-projects');
   if (projects.length === 0) {
-    container.innerHTML = '<div class="empty"><div class="empty-icon">📁</div><div class="empty-text">У вас пока нет проектов</div><button class="btn-primary" onclick="location.href=\'/order\'">Заказать сайт</button></div>';
+  container.innerHTML = '<div class="empty"><div class="empty-icon">📁</div><div class="empty-text">У вас пока нет проектов.<br>Если вы уже оставляли заявку на сайте, проект появится здесь после того, как менеджер её обработает.</div><button class="btn-primary" onclick="location.href=\'/order\'">Заказать сайт</button></div>';
     return;
   }
   container.innerHTML = projects.slice(0, 3).map(p => projectCardHTML(p)).join('');
@@ -732,8 +732,10 @@ function renderRequests() {
   
   const container = document.getElementById('requests-list');
   if (filtered.length === 0) {
-    container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">' + 
-      (reqs.length === 0 ? 'У вас пока нет заявок' : 'Нет заявок с таким статусом') + '</div></div>';
+  container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">' + 
+      (reqs.length === 0
+        ? 'У вас пока нет заявок на правки.<br>Нажмите «Новая заявка», чтобы попросить нас изменить текст, картинку или блок на сайте.'
+        : 'Нет заявок с таким статусом') + '</div></div>';
     return;
   }
   container.innerHTML = filtered.map(r => {
