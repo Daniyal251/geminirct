@@ -1,0 +1,118 @@
+{
+  "name": "RKT — Уведомления в Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"]
+      },
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "credentials": {
+        "telegramApi": "RKT Telegram Bot"
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.message.text }}",
+              "value2": "/start",
+              "operation": "equals"
+            }
+          ]
+        }
+      },
+      "name": "Is Start Command",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "={{ `👋 Привет! Я ИИ-ассистент RCT.\\n\\nЧем могу помочь?\\n\\n🏥 Медоборудование\\n🌐 Сайты\\n🎬 AI-контент\\n🤖 ИИ-агенты\\n\\nНапишите ваш вопрос или выберите команду:\\n/audit — AI-аудит сайта\\n/generate — AI-генерация\\n/price — Узнать цены` }}"
+      },
+      "name": "Send Welcome",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [650, 200],
+      "credentials": {
+        "telegramApi": "RKT Telegram Bot"
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "={{ `🤖 Обработка вашего запроса...\\n\\n${$json.message.text}` }}"
+      },
+      "name": "Send Processing",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [650, 400],
+      "credentials": {
+        "telegramApi": "RKT Telegram Bot"
+      }
+    },
+    {
+      "parameters": {
+        "model": "gigachat-pro",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Ты ИИ-ассистент RCT. Отвечай кратко и по делу на русском языке."
+            },
+            {
+              "role": "user",
+              "content": "={{ $json.message.text }}"
+            }
+          ]
+        }
+      },
+      "name": "GigaChat Response",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [850, 400],
+      "credentials": {
+        "gigachatApi": "RKT GigaChat"
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "={{ $json.response }}",
+        "additionalFields": {}
+      },
+      "name": "Send Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1050, 400],
+      "credentials": {
+        "telegramApi": "RKT Telegram Bot"
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [[{ "node": "Is Start Command", "type": "main", "index": 0 }]]
+    },
+    "Is Start Command": {
+      "main": [
+        [{ "node": "Send Welcome", "type": "main", "index": 0 }],
+        [{ "node": "Send Processing", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Processing": {
+      "main": [[{ "node": "GigaChat Response", "type": "main", "index": 0 }]]
+    },
+    "GigaChat Response": {
+      "main": [[{ "node": "Send Response", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

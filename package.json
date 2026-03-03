@@ -1,0 +1,24 @@
+{
+  "name": "rct-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:main\" \"npm run dev:med\" \"npm run dev:ai\"",
+    "dev:main": "npm run dev --workspace=apps/main",
+    "dev:med": "npm run dev --workspace=apps/med",
+    "dev:ai": "npm run dev --workspace=apps/ai-architect",
+    "build": "npm run build --workspaces",
+    "build:main": "npm run build --workspace=apps/main",
+    "build:med": "npm run build --workspace=apps/med",
+    "build:ai": "npm run build --workspace=apps/ai-architect",
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

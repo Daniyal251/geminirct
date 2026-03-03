@@ -1,0 +1,21 @@
+{
+  "name": "rkt-hub",
+  "version": "14.0.0",
+  "description": "RKT HUB — Система управления проектами",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "rkt",
+    "project-management",
+    "crm"
+  ],
+  "author": "RCT",
+  "license": "MIT"
+}

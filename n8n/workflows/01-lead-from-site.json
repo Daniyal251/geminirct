@@ -1,0 +1,69 @@
+{
+  "name": "RKT — Заявка с сайта",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rkt-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "execute",
+        "query": "INSERT INTO ai_leads (name, phone, email, company, type, budget, description, deadline, status, source) VALUES ('{{ $json.body.name }}', '{{ $json.body.phone }}', '{{ $json.body.email }}', '{{ $json.body.company }}', '{{ $json.body.type }}', '{{ $json.body.budget }}', '{{ $json.body.description }}', '{{ $json.body.deadline }}', 'new', '{{ $json.body.source || 'website' }}') RETURNING id"
+      },
+      "name": "Save to DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": "RKT PostgreSQL"
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TG_CHAT_ID }}",
+        "text": "={{ `📝 Новая заявка\\n\\n👤 Имя: ${$json.body.name}\\n📱 Телефон: ${$json.body.phone}\\n📧 Email: ${$json.body.email || 'Не указан'}\\n🏢 Компания: ${$json.body.company || 'Не указана'}\\n📋 Тип: ${$json.body.type}\\n💰 Бюджет: ${$json.body.budget || 'Не указан'}\\n\\n📝 Описание:\\n${$json.body.description}` }}",
+        "additionalFields": {}
+      },
+      "name": "Telegram Notify",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "telegramApi": "RKT Telegram Bot"
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"success\": true, \"message\": \"Заявка отправлена\", \"lead_id\": {{ $node[\"Save to DB\"].json[\"id\"] }} }",
+        "options": {}
+      },
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Save to DB", "type": "main", "index": 0 }]]
+    },
+    "Save to DB": {
+      "main": [[{ "node": "Telegram Notify", "type": "main", "index": 0 }]]
+    },
+    "Telegram Notify": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

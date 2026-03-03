@@ -1,0 +1,79 @@
+{
+  "name": "RKT — AI-аудит сайта",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-audit",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "model": "gigachat-pro",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Ты эксперт по анализу сайтов. Проанализируй сайт и верни JSON: {\"overall\": 0-100, \"scores\": {\"seo\": 0-100, \"performance\": 0-100, \"accessibility\": 0-100, \"best_practices\": 0-100}, \"recommendations\": [\"список\"]}"
+            },
+            {
+              "role": "user",
+              "content": "={{ `Проанализируй сайт: ${$json.body.url}` }}"
+            }
+          ]
+        }
+      },
+      "name": "GigaChat Audit",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [450, 300],
+      "credentials": {
+        "gigachatApi": "RKT GigaChat"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "execute",
+        "query": "INSERT INTO ai_audits (url, overall_score, seo_score, performance_score, accessibility_score, best_practices_score, report, status, user_id, session_id) VALUES ('{{ $json.body.url }}', {{ $json.audit.overall }}, {{ $json.audit.scores.seo }}, {{ $json.audit.scores.performance }}, {{ $json.audit.scores.accessibility }}, {{ $json.audit.scores.best_practices }}, '{{ $json.audit | json }}', 'completed', '{{ $json.body.user_id }}', '{{ $json.body.session_id }}') RETURNING id"
+      },
+      "name": "Save to DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [650, 300],
+      "credentials": {
+        "postgres": "RKT PostgreSQL"
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{{ $json.audit }}",
+        "options": {}
+      },
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "GigaChat Audit", "type": "main", "index": 0 }]]
+    },
+    "GigaChat Audit": {
+      "main": [[{ "node": "Save to DB", "type": "main", "index": 0 }]]
+    },
+    "Save to DB": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

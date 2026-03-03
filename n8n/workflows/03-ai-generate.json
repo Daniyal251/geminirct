@@ -1,0 +1,68 @@
+{
+  "name": "RKT — AI-генерация сайта",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-generate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "model": "claude-3-5-sonnet",
+        "prompt": "={{ `Создай сайт типа \"${$json.body.type}\". Стиль: ${$json.body.style || 'современный'}. Цвета: ${$json.body.colors || 'нейтральные'}. Описание: ${$json.body.description}. Верни ТОЛЬКО JSON: {\"html\": \"...\", \"css\": \"...\", \"js\": \"...\"}` }}"
+      },
+      "name": "Claude Generate",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [450, 300],
+      "credentials": {
+        "anthropicApi": "RKT Claude"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "execute",
+        "query": "INSERT INTO ai_generations (type, description, style, colors, html, css, js, files, status, user_id, session_id) VALUES ('{{ $json.body.type }}', '{{ $json.body.description }}', '{{ $json.body.style }}', '{{ $json.body.colors }}', '{{ $json.code.html }}', '{{ $json.code.css }}', '{{ $json.code.js }}', '{{ $json.code | json }}', 'draft', '{{ $json.body.user_id }}', '{{ $json.body.session_id }}') RETURNING id"
+      },
+      "name": "Save to DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [650, 300],
+      "credentials": {
+        "postgres": "RKT PostgreSQL"
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{{ $json.code }}",
+        "options": {}
+      },
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Claude Generate", "type": "main", "index": 0 }]]
+    },
+    "Claude Generate": {
+      "main": [[{ "node": "Save to DB", "type": "main", "index": 0 }]]
+    },
+    "Save to DB": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

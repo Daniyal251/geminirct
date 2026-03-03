@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #060a14;
+  --bg2: #0c1220;
+  --bg3: #121a2c;
+  --accent: #00e5a0;
+  --accent2: #00c48c;
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --orange: #f59e0b;
+  --text: #edf2f7;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --border: rgba(255, 255, 255, 0.06);
+}
+
+* {
+  @apply border-border box-border;
+}
+
+body {
+  @apply bg-bg text-text antialiased;
+  font-family: 'Manrope', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Unbounded', sans-serif;
+}
+
+@layer utilities {
+  .gradient-text {
+    @apply bg-gradient-to-r from-accent to-blue bg-clip-text text-transparent;
+  }
+}

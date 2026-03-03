@@ -1,0 +1,8 @@
+# Игнорируем всё, кроме важных файлов
+node_modules
+.next
+dist
+build
+*.log
+.env
+.env.local
